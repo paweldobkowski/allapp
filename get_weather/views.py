@@ -1,5 +1,7 @@
 from django.shortcuts import render, redirect
 import requests
+from requests.adapters import HTTPAdapter
+from requests.packages.urllib3.util.retry import Retry
 from time import sleep
 from lxml import html
 
@@ -32,7 +34,15 @@ def get_weather(request):
         #  koniec usuwania
 
         url = site + city_corrected
-        page = requests.get(url)
+
+        session = requests.Session()
+        retry = Retry(connect=5, backoff_factor=0.5)
+        adapter = HTTPAdapter(max_retries=retry)
+        session.mount('http://', adapter)
+        session.mount('https://', adapter)
+
+        
+        page = session.get(url)
         structured = html.fromstring(page.content)
              
         temp = structured.xpath('/html/body/div[3]/main/article/section[1]/div/div/div/text()')[0].strip()                      
