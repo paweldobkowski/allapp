@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block body %}
+
+<div class="container" style="text-align: center; padding-top: 10%; padding-bottom: 5%;">
+    <form action="{% url 'get_weather:get_weather' %}" method="post">
+        {% csrf_token %}
+        <div class="input-group mb-3" style="margin: 0 auto; width: 300px; text-align: center;">
+            <input name="city" type="text" class="form-control" placeholder="Miasto..." value="{{ last_search }}">
+            <button class="btn btn-outline-secondary" type="submit" id="display_button">DISPLAY</button>
+        </div>
+    </form>
+</div>
+
+{% block search %}
+
+{% endblock search %}
+
+{% endblock body %}

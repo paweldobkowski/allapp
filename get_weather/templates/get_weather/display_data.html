@@ -1,0 +1,16 @@
+{% extends 'get_weather/weather_base.html' %}
+
+{% block search %}
+
+<div class="container" style="text-align: center">
+    <div class="alert alert-warning shadow-sm" role="alert" style="width: 50%; text-align: center; margin: 0 auto;">
+        <h4 class="alert-heading"><b>{{ time }}</b></h4>
+        <hr>
+        <div style="text-align: justify">
+        <h5>Aktualna temperatura: <b>{{ temp }}</b> </h5>
+        <h5 class="mb-0">Odczuwalna: <b>{{ temp_sensed }}</b></h5>
+    </div>
+    </div>
+</div>
+
+{% endblock search %}

@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+
+{% load noter_extras %}
+
+{% block body %}
+
+<div class="container">
+    <div class="card shadow rounded" style="padding-bottom: auto; margin-bottom: 100px; margin-top: 100px; background: #D5D8DC ;">
+        <div class="container" style="text-align: center; margin-top: 30px;">
+            <form autocomplete="off" action="{% url 'noter:add_note' %}" method="POST">
+                {% csrf_token %}
+                <div class="input-group" style="margin: 0 auto; width: 90%; text-align: center;">
+                    
+                    <span class="input-group-text bg-white d-block"><i class="fa fa-sticky-note fa-2x"></i></span>
+                    <input autocomplete="off" name="content" id="content" type="text" class="form-control w-50" placeholder="Notatka...">
+                    
+                    <span class="input-group-text bg-white d-block"><i class="fa fa-calendar fa-2x"></i></span>
+                    <input autocomplete="off" name="deadline" type="text" id="datepicker" class="form-control" placeholder="Deadline... (opcjonalnie)">
+
+                    <button class="btn btn-outline-dark" type="submit" id="display_button">DODAJ</button>
+                </div>
+            </form>
+        </div>
+
+        <script type="text/javascript">
+            $('#datepicker').datepicker({
+                format: 'yyyy-mm-dd',
+                todayHighlight: true,
+                autoclose: true,
+                startDate: "today",
+                clearBtn: true,
+            });
+        </script>
+        
+        <script>
+            document.getElementById("content").focus();
+        </script>
+
+        <hr>
+        <div class="card-body">
+            <div class="container">
+
+                {% if notes_to_show %}
+
+                    {% for note in notes_to_show %}
+                    {% if note.is_done == False %}
+                    
+                    <form action="{% url 'noter:note_is_done' id=note.id %}">
+                        {% csrf_token %}
+                        {% if note.deadline == today %}
+
+                        <div class="alert alert-danger alert-dismissible container shadow-lg" role="alert">
+                            <input class="form-check-input" type="checkbox" style="margin-right: 10px;" onchange="this.form.submit()">
+                            <b>{{ note.content }}</b>
+                            <span class="opacity-50"> - (Pozostało dni: <b>DO DZIŚ</b>
+
+                        {% else %}
+
+                        <div class="alert alert-warning alert-dismissible container shadow-lg" role="alert">
+                            <input class="form-check-input" type="checkbox" style="margin-right: 10px;" onchange="this.form.submit()">
+                            <b>{{ note.content }}</b>
+                            <span class="opacity-50"> - (Pozostało dni: <b>{{ note.deadline | date_diff }}</b>
+
+                        {% endif %}
+                            </b>)</span>
+                            <button type="submit" class="btn-close" formaction="{% url 'noter:delete_note' id=note.id %}"></button>
+                        </div>
+                    </form>
+                    
+                    {% elif note.is_done == True %}
+                    
+                    <form action="{% url 'noter:note_is_done' id=note.id %}">
+                        {% csrf_token %}
+                        <div class="alert alert-success alert-dismissible container shadow-sm" role="alert">
+                            <input class="form-check-input" type="checkbox" style="margin-right: 10px;" disabled checked>
+                            <b><s>{{ note.content }}</s></b>
+                            <span class="opacity-50"> - (Ukończono: <b>{{ note.modified | date:"Y-m-d" }}</b>)</span>
+                        </div>
+                    </form>
+
+                    {% endif %}
+
+                    {% endfor %}
+
+                {% else %}
+
+                    <h1 class="display-6 text-muted" style="margin: 100px; margin-bottom: 150px; text-align: center">Brak zadań</h1>
+
+                {% endif %}
+
+                    <hr style="margin: 25px">
+                    <div class="container">
+                        <div class="form-check-inline">
+                            <form action="{% url 'noter:show_all_radio' %}">
+                                {% csrf_token %}
+                                <input class="form-check-input" type="radio" name="wszystkie_radio" id="flexRadioDefault1" {{request.session.show_all}} onchange="this.form.submit()">
+                                <label class="form-check-label" for="flexRadioDefault1">
+                                Wszystkie
+                                </label>
+                            </form>
+                        </div>
+                        <div class="form-check-inline">
+                            <form action="{% url 'noter:only_pending_radio' %}">
+                                {% csrf_token %}
+                                <input class="form-check-input" type="radio" name="dozrobienia_radio" id="flexRadioDefault3" {{request.session.only_pending}} onchange="this.form.submit()">
+                                <label class="form-check-label" for="flexRadioDefault3">
+                                Do zrobienia
+                                </label>
+                            </form>
+                        </div> 
+                        <div class="form-check-inline">
+                            <form action="{% url 'noter:only_done_radio' %}">
+                                {% csrf_token %}
+                                <input class="form-check-input" type="radio" name="zrobione_radio" id="flexRadioDefault2" {{request.session.only_done}} onchange="this.form.submit()">
+                                <label class="form-check-label" for="flexRadioDefault2">
+                                Zrobione
+                                </label>
+                            </form>
+                        </div>                      
+                    </div>
+                </div>
+            </div>        
+        </div>
+    </div>
+</div>
+
+{% endblock body %}
