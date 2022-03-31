@@ -83,6 +83,8 @@
                             <input class="form-check-input" type="checkbox" style="margin-right: 10px;" disabled checked>
                             <b><s>{{ note.content }}</s></b>
                             <span class="opacity-75"> [Ukończono: <b>{{ note.modified | date:"Y-m-d" }}</b>]</span>
+                            </span>
+                            <button type="submit" class="btn-close" formaction="{% url 'noter:delete_note' id=note.id %}"></button>
                         </div>
                     </form>
 
