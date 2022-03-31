@@ -49,21 +49,28 @@
                         {% csrf_token %}
                         {% if note.deadline == today %}
 
-                        <div class="alert alert-danger alert-dismissible container shadow-lg" role="alert">
-                            <input class="form-check-input" type="checkbox" style="margin-right: 10px;" onchange="this.form.submit()">
-                            <b>{{ note.content }}</b>
-                            <span class="opacity-50"> - (Pozostało dni: <b>DO DZIŚ</b>
-
-                        {% else %}
-
                         <div class="alert alert-warning alert-dismissible container shadow-lg" role="alert">
                             <input class="form-check-input" type="checkbox" style="margin-right: 10px;" onchange="this.form.submit()">
                             <b>{{ note.content }}</b>
-                            <span class="opacity-50"> - (Pozostało dni: <b>{{ note.deadline | date_diff }}</b>
+                            <span class="opacity-75"> [<b>DO DZIŚ</b>]
+                            
+                        {% elif note.deadline < today %}
+
+                        <div class="alert alert-danger alert-dismissible container shadow-lg" role="alert">
+                            <input class="form-check-input" type="checkbox" style="margin-right: 10px;" onchange="this.form.submit()">
+                            <b>{{ note.content }}</b>
+                            <span class="opacity-75"> [<b>PO TERMINIE</b>]
+
+                        {% else %}
+
+                        <div class="alert alert-light alert-dismissible container shadow-lg" role="alert">
+                            <input class="form-check-input" type="checkbox" style="margin-right: 10px;" onchange="this.form.submit()">
+                            <b>{{ note.content }}</b>
+                            <span class="opacity-75"> [Pozostało dni: <b>{{ note.deadline | date_diff }}</b>]
 
                         {% endif %}
                         
-                            </b>)</span>
+                            </span>
                             <button type="submit" class="btn-close" formaction="{% url 'noter:delete_note' id=note.id %}"></button>
                         </div>
                     </form>
@@ -75,7 +82,7 @@
                         <div class="alert alert-success alert-dismissible container shadow-sm" role="alert">
                             <input class="form-check-input" type="checkbox" style="margin-right: 10px;" disabled checked>
                             <b><s>{{ note.content }}</s></b>
-                            <span class="opacity-50"> - (Ukończono: <b>{{ note.modified | date:"Y-m-d" }}</b>)</span>
+                            <span class="opacity-75"> [Ukończono: <b>{{ note.modified | date:"Y-m-d" }}</b>]</span>
                         </div>
                     </form>
 

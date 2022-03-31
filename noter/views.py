@@ -30,16 +30,18 @@ def add_note(request):
     else:
 
         today = dtz.localdate() #- timedelta(days=1)
+        week = timedelta(weeks=1)
+        week_before_today = today - week
 
         if request.session.get('show_all') == 'checked':
-            notes_to_show = models.Note.objects.filter(deadline__gte=today, user_id=request.session.get('user_id')).order_by('is_done')
+            notes_to_show = models.Note.objects.filter(deadline__gte=week_before_today, user_id=request.session.get('user_id')).order_by('is_done', 'deadline')
         
         elif request.session.get('only_done') == 'checked':
-            notes_to_show = models.Note.objects.filter(deadline__gte=today, user_id=request.session.get('user_id')).order_by('is_done')
+            notes_to_show = models.Note.objects.filter(deadline__gte=week_before_today, user_id=request.session.get('user_id')).order_by('is_done', 'deadline')
             notes_to_show = notes_to_show.filter(is_done=True)
 
         else:
-            notes_to_show = models.Note.objects.filter(deadline__gte=today, user_id=request.session.get('user_id')).order_by('is_done')
+            notes_to_show = models.Note.objects.filter(deadline__gte=week_before_today, user_id=request.session.get('user_id')).order_by('is_done', 'deadline')
             notes_to_show = notes_to_show.filter(is_done=False)
 
         context = {

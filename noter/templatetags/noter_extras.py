@@ -8,4 +8,4 @@ def date_diff(a_date):
     today = datetime.now().date() - timedelta(days=1)
     diff = (a_date - today).days
 
-    return diff
+    return abs(diff)

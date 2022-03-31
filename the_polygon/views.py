@@ -22,7 +22,7 @@ def start(request):
             return redirect('start')
 
         else:
-            messages.info(request, f'Blędne hasło dla użytkownika {u.username}')
+            messages.info(request, f'Błędne hasło dla użytkownika {u.username}')
             return redirect('start')
 
     else:
