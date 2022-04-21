@@ -1,0 +1,304 @@
+{% extends 'game\game_base.html' %}
+
+{% load static %}
+
+{% block body %}
+
+{% if who_won == 'player' %}
+
+<div id="confettis">
+    <div class="confetti"></div>
+    <div class="confetti"></div>
+    <div class="confetti"></div>
+    <div class="confetti"></div>
+    <div class="confetti"></div>
+    <div class="confetti"></div>
+    <div class="confetti"></div>
+    <div class="confetti"></div>
+    <div class="confetti"></div>
+    <div class="confetti"></div>
+</div>
+
+<div class="container" style="text-align: center; padding-top: 1%">
+    <h1>YOU WON!</h1>
+</div>
+
+<div class="container" style="max-width: 330px; padding-top: 1%;">
+    {% if player.rarity == 'COMMON' %}
+    <div class="card end_dance mb-3" id="card_common" style="max-width: 300px; background-color: lightgray; border-width: 15px; border-radius: 15px;">
+    {% elif player.rarity == 'RARE' %}
+    <div class="card end_dance mb-3" id="card_rare" style="max-width: 300px; background-color: lightblue; border-width: 15px; border-radius: 15px;">
+    {% elif player.rarity == 'EPIC' %}
+    <div class="card end_dance mb-3" id="card_epic" style="max-width: 300px; background-color: lightpink; border-width: 15px; border-radius: 15px;">
+    {% else %}
+    <div class="card end_dance mb-3" id="card_legendary" style="max-width: 300px; background-color: gold; border-width: 15px; border-radius: 15px;">
+    {% endif %}
+        <div class="card-header" style="text-align: center; color: red;"><b>{{ player.name }}</b> <br><i style="color:black">[{{ player.rarity }}]</i></div>
+            <div class="card-body" style="text-align: left;">
+                <div class="container" style="text-align: center; margin-top: 10px; margin-bottom:10px; background-color: white; margin-bottom: 30px; border-radius: 5px;">
+                    <img src="{% static 'images/c_boxer.gif' %}" style="margin-top: 15px; margin-bottom:15px;">
+                </div>
+                <div class="row">
+                    <div class="col-4">
+                        <b>life:</b>
+                    </div>
+                    <div class="col">
+                        <div class="progress" style="height: 20px;">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" style="width: {% widthratio player.life 200 100 %}%" aria-valuenow="{% widthratio player.life 200 100 %}" aria-valuemin="0" aria-valuemax="100">
+                                <b>{{ player.life | floatformat:0 }}</b>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-4">
+                        <b>energy:</b>
+                    </div>
+                    <div class="col">
+                        <div class="progress" style="height: 20px;">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated bg-warning" role="progressbar" style="width: {% widthratio player.energy 5 100 %}%" aria-valuenow="{% widthratio player.energy 5 100 %}" aria-valuemin="0" aria-valuemax="5">
+                                <b>{{ player.energy | floatformat:0 }}</b>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-4">
+                        <b>power:</b>
+                    </div>
+                    <div class="col">
+                        <div class="progress" style="height: 20px;">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated bg-danger" role="progressbar" style="width: {% widthratio player.power 10 100 %}%" aria-valuenow="{% widthratio player.power 10 100 %}" aria-valuemin="0" aria-valuemax="10">
+                                <b>{{ player.power | floatformat:0 }}</b>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-4">
+                        <b>agility:</b>
+                    </div>
+                    <div class="col">
+                        <div class="progress" style="height: 20px;">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated bg-info" role="progressbar" style="width: {% widthratio player.agility 10 100 %}%" aria-valuenow="{% widthratio player.agility 10 100 %}" aria-valuemin="0" aria-valuemax="10">
+                                <b>{{ player.agility | floatformat:0 }}</b>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-4">
+                        <b>block:</b>
+                    </div>
+                    <div class="col">
+                        <div class="progress" style="height: 20px;">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated bg-black" role="progressbar" style="width: {% widthratio player.block 5 100 %}%" aria-valuenow="{% widthratio player.block 5 100 %}" aria-valuemin="0" aria-valuemax="10">
+                                <b>{{ player.block | floatformat:0 }}</b>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container" style="text-align: center; padding-top: 1%">
+    <h1>BY THE {{ won_by }}</h1>
+    <h4>SCORES:</h4>
+    <h4>Kenny Bayless: {{ j1_score.p_s }} to {{ j1_score.o_s }}</h4>
+    <h4>Tony Weeks: {{ j2_score.p_s }} to {{ j2_score.o_s }}</h4>
+    <h4>Steve Smoger: {{ j3_score.p_s }} to {{ j3_score.o_s }}</h4>
+</div>
+
+{% elif who_won == 'opponent' %}
+
+<div class="container" style="text-align: center; padding-top: 1%">
+    <h1>YOU LOST!</h1>
+</div>
+
+<div class="container" style="max-width: 330px; padding-top: 1%;">
+    {% if player.rarity == 'COMMON' %}
+    <div class="card end_dance mb-3" id="card_common" style="max-width: 300px; background-color: lightgray; border-width: 15px; border-radius: 15px;">
+    {% elif player.rarity == 'RARE' %}
+    <div class="card end_dance mb-3" id="card_rare" style="max-width: 300px; background-color: lightblue; border-width: 15px; border-radius: 15px;">
+    {% elif player.rarity == 'EPIC' %}
+    <div class="card end_dance mb-3" id="card_epic" style="max-width: 300px; background-color: lightpink; border-width: 15px; border-radius: 15px;">
+    {% else %}
+    <div class="card end_dance mb-3" id="card_legendary" style="max-width: 300px; background-color: gold; border-width: 15px; border-radius: 15px;">
+    {% endif %}
+        <div class="card-header" style="text-align: center; color: red;"><b>{{ player.name }}</b> <br><i style="color:black">[{{ player.rarity }}]</i></div>
+            <div class="card-body" style="text-align: left;">
+                <div class="container" style="text-align: center; margin-top: 10px; margin-bottom:10px; background-color: white; margin-bottom: 30px; border-radius: 5px;">
+                    <img src="{% static 'images/c_boxer.gif' %}" style="margin-top: 15px; margin-bottom:15px;">
+                </div>
+                <div class="row">
+                    <div class="col-4">
+                        <b>life:</b>
+                    </div>
+                    <div class="col">
+                        <div class="progress" style="height: 20px;">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" style="width: {% widthratio player.life 200 100 %}%" aria-valuenow="{% widthratio player.life 200 100 %}" aria-valuemin="0" aria-valuemax="100">
+                                <b>{{ player.life | floatformat:0 }}</b>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-4">
+                        <b>energy:</b>
+                    </div>
+                    <div class="col">
+                        <div class="progress" style="height: 20px;">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated bg-warning" role="progressbar" style="width: {% widthratio player.energy 5 100 %}%" aria-valuenow="{% widthratio player.energy 5 100 %}" aria-valuemin="0" aria-valuemax="5">
+                                <b>{{ player.energy | floatformat:0 }}</b>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-4">
+                        <b>power:</b>
+                    </div>
+                    <div class="col">
+                        <div class="progress" style="height: 20px;">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated bg-danger" role="progressbar" style="width: {% widthratio player.power 10 100 %}%" aria-valuenow="{% widthratio player.power 10 100 %}" aria-valuemin="0" aria-valuemax="10">
+                                <b>{{ player.power | floatformat:0 }}</b>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-4">
+                        <b>agility:</b>
+                    </div>
+                    <div class="col">
+                        <div class="progress" style="height: 20px;">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated bg-info" role="progressbar" style="width: {% widthratio player.agility 10 100 %}%" aria-valuenow="{% widthratio player.agility 10 100 %}" aria-valuemin="0" aria-valuemax="10">
+                                <b>{{ player.agility | floatformat:0 }}</b>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-4">
+                        <b>block:</b>
+                    </div>
+                    <div class="col">
+                        <div class="progress" style="height: 20px;">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated bg-black" role="progressbar" style="width: {% widthratio player.block 5 100 %}%" aria-valuenow="{% widthratio player.block 5 100 %}" aria-valuemin="0" aria-valuemax="10">
+                                <b>{{ player.block | floatformat:0 }}</b>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container" style="text-align: center; padding-top: 1%">
+    <h1>BY THE {{ won_by }}</h1>
+    <h4>SCORES:</h4>
+    <h4>Kenny Bayless: {{ j1_score.p_s }} to {{ j1_score.o_s }}</h4>
+    <h4>Tony Weeks: {{ j2_score.p_s }} to {{ j2_score.o_s }}</h4>
+    <h4>Steve Smoger: {{ j3_score.p_s }} to {{ j3_score.o_s }}</h4>
+</div>
+
+{% else %}
+
+<div class="container" style="text-align: center; padding-top: 1%">
+    <h1>IT'S A DRAW!</h1>
+</div>
+
+<div class="container" style="max-width: 330px; padding-top: 1%;">
+    {% if player.rarity == 'COMMON' %}
+    <div class="card end_dance mb-3" id="card_common" style="max-width: 300px; background-color: lightgray; border-width: 15px; border-radius: 15px;">
+    {% elif player.rarity == 'RARE' %}
+    <div class="card end_dance mb-3" id="card_rare" style="max-width: 300px; background-color: lightblue; border-width: 15px; border-radius: 15px;">
+    {% elif player.rarity == 'EPIC' %}
+    <div class="card end_dance mb-3" id="card_epic" style="max-width: 300px; background-color: lightpink; border-width: 15px; border-radius: 15px;">
+    {% else %}
+    <div class="card end_dance mb-3" id="card_legendary" style="max-width: 300px; background-color: gold; border-width: 15px; border-radius: 15px;">
+    {% endif %}
+        <div class="card-header" style="text-align: center; color: red;"><b>{{ player.name }}</b> <br><i style="color:black">[{{ player.rarity }}]</i></div>
+            <div class="card-body" style="text-align: left;">
+                <div class="container" style="text-align: center; margin-top: 10px; margin-bottom:10px; background-color: white; margin-bottom: 30px; border-radius: 5px;">
+                    <img src="{% static 'images/c_boxer.gif' %}" style="margin-top: 15px; margin-bottom:15px;">
+                </div>
+                <div class="row">
+                    <div class="col-4">
+                        <b>life:</b>
+                    </div>
+                    <div class="col">
+                        <div class="progress" style="height: 20px;">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" style="width: {% widthratio player.life 200 100 %}%" aria-valuenow="{% widthratio player.life 200 100 %}" aria-valuemin="0" aria-valuemax="100">
+                                <b>{{ player.life | floatformat:0 }}</b>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-4">
+                        <b>energy:</b>
+                    </div>
+                    <div class="col">
+                        <div class="progress" style="height: 20px;">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated bg-warning" role="progressbar" style="width: {% widthratio player.energy 5 100 %}%" aria-valuenow="{% widthratio player.energy 5 100 %}" aria-valuemin="0" aria-valuemax="5">
+                                <b>{{ player.energy | floatformat:0 }}</b>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-4">
+                        <b>power:</b>
+                    </div>
+                    <div class="col">
+                        <div class="progress" style="height: 20px;">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated bg-danger" role="progressbar" style="width: {% widthratio player.power 10 100 %}%" aria-valuenow="{% widthratio player.power 10 100 %}" aria-valuemin="0" aria-valuemax="10">
+                                <b>{{ player.power | floatformat:0 }}</b>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-4">
+                        <b>agility:</b>
+                    </div>
+                    <div class="col">
+                        <div class="progress" style="height: 20px;">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated bg-info" role="progressbar" style="width: {% widthratio player.agility 10 100 %}%" aria-valuenow="{% widthratio player.agility 10 100 %}" aria-valuemin="0" aria-valuemax="10">
+                                <b>{{ player.agility | floatformat:0 }}</b>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-4">
+                        <b>block:</b>
+                    </div>
+                    <div class="col">
+                        <div class="progress" style="height: 20px;">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated bg-black" role="progressbar" style="width: {% widthratio player.block 5 100 %}%" aria-valuenow="{% widthratio player.block 5 100 %}" aria-valuemin="0" aria-valuemax="10">
+                                <b>{{ player.block | floatformat:0 }}</b>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container" style="text-align: center; padding-top: 1%">
+    <h1>BY THE {{ won_by }}</h1>
+    <h4>SCORES:</h4>
+    <h4>Kenny Bayless: {{ j1_score.p_s }} to {{ j1_score.o_s }}</h4>
+    <h4>Tony Weeks: {{ j2_score.p_s }} to {{ j2_score.o_s }}</h4>
+    <h4>Steve Smoger: {{ j3_score.p_s }} to {{ j3_score.o_s }}</h4>
+</div>
+
+{% endif %}
+
+{% endblock body %}

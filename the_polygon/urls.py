@@ -21,5 +21,6 @@ urlpatterns = [
     path('', views.start, name='start'),
     path('noter/', include('noter.urls')),
     path('weather_app/', include('get_weather.urls')),
+    path('game/', include('game.urls')),
     path('admin/', admin.site.urls),
 ]

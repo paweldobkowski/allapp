@@ -1,0 +1,103 @@
+{% extends 'game\game_base.html' %}
+
+{% load static %}
+
+{% block body %}
+
+<div class="container" style="text-align: center; padding-top: 5%">
+    <h4>NEW OPPONENT!</h4>
+</div>
+
+<div class="container" style="max-width: 330px; padding-bottom: 1%;">
+    {% if opponent.rarity == 'COMMON' %}
+    <div class="card reveal mb-3" id="card_common" style="max-width: 300px; background-color: lightgray; border-width: 15px; border-radius: 15px;">
+    {% elif opponent.rarity == 'RARE' %}
+    <div class="card reveal mb-3" id="card_rare" style="max-width: 300px; background-color: lightblue; border-width: 15px; border-radius: 15px;">
+    {% elif opponent.rarity == 'EPIC' %}
+    <div class="card reveal mb-3" id="card_epic" style="max-width: 300px; background-color: lightpink; border-width: 15px; border-radius: 15px;">
+    {% else %}
+    <div class="card reveal mb-3" id="card_legendary" style="max-width: 300px; background-color: gold; border-width: 15px; border-radius: 15px;">
+    {% endif %}
+        <div class="card-header" style="text-align: center; color: red;"><b>{{ opponent.name }}</b> <br><i style="color:black">[{{ opponent.rarity }}]</i></div>
+            <div class="card-body" style="text-align: left;">
+                <div class="container" style="text-align: center; margin-top: 10px; margin-bottom:10px; background-color: white; margin-bottom: 30px; border-radius: 5px;">
+                    <img src="{% static 'images/c_boxer_o.gif' %}" style="margin-top: 15px; margin-bottom:15px;">
+                </div>
+                <div class="row">
+                    <div class="col-4">
+                        <b>life:</b>
+                    </div>
+                    <div class="col">
+                        <div class="progress" style="height: 20px;">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" style="width: {% widthratio opponent.life 200 100 %}%" aria-valuenow="{% widthratio opponent.life 200 100 %}" aria-valuemin="0" aria-valuemax="100">
+                                <b>{{ opponent.life }}</b>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-4">
+                        <b>energy:</b>
+                    </div>
+                    <div class="col">
+                        <div class="progress" style="height: 20px;">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated bg-warning" role="progressbar" style="width: {% widthratio opponent.energy 5 100 %}%" aria-valuenow="{% widthratio opponent.energy 5 100 %}" aria-valuemin="0" aria-valuemax="5">
+                                <b>{{ opponent.energy }}</b>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-4">
+                        <b>power:</b>
+                    </div>
+                    <div class="col">
+                        <div class="progress" style="height: 20px;">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated bg-danger" role="progressbar" style="width: {% widthratio opponent.power 10 100 %}%" aria-valuenow="{% widthratio opponent.power 10 100 %}" aria-valuemin="0" aria-valuemax="10">
+                                <b>{{ opponent.power }}</b>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-4">
+                        <b>agility:</b>
+                    </div>
+                    <div class="col">
+                        <div class="progress" style="height: 20px;">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated bg-info" role="progressbar" style="width: {% widthratio opponent.agility 10 100 %}%" aria-valuenow="{% widthratio opponent.agility 10 100 %}" aria-valuemin="0" aria-valuemax="10">
+                                <b>{{ opponent.agility }}</b>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-4">
+                        <b>block:</b>
+                    </div>
+                    <div class="col">
+                        <div class="progress" style="height: 20px;">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated bg-black" role="progressbar" style="width: {% widthratio opponent.block 5 100 %}%" aria-valuenow="{% widthratio opponent.block 5 100 %}" aria-valuemin="0" aria-valuemax="10">
+                                <b>{{ opponent.block }}</b>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container" style="text-align: center">
+    <h4>What you wanna do?</h4>
+    <div class="container" style="padding: 2%">
+        <form action="{% url 'game:fight' %}" method="POST">
+            {% csrf_token %}
+            <button type="submit" value="fight" name="strategy" class="btn btn-danger btn-lg">FIGHT</button>
+            <button type="submit" formaction="{% url 'game:introduction' %}" value="skip" name="strategy" class="btn btn-warning btn-lg">SKIP</button>
+        </form>
+    </div>
+    <p><span style="color: red">WARNING:</span> Once you click <span style="color: red">[FIGHT]</span>, the fight starts. You must win, otherwise a loss will be added to Your record.</p>
+</div>
+
+{% endblock body %}

@@ -1,0 +1,245 @@
+{% extends 'game\game_base.html' %}
+
+{% load game_extras %}
+
+{% load static %}
+
+{% block body %}
+
+<div class="container" style="max-width:fit-content; padding-top: 1%;">
+{% if round_num == 13 %}
+
+    <h1>FIGHT IS OVER!</h1>
+
+{% else %}
+
+    <h1>ROUND: {{ round_num }}</h1>
+
+{% endif %}
+</div>
+
+<div class="container" style="padding-top: 3%;">
+    <div class="row">
+        <div class="col" style="text-align: left;">
+            <div class="container" style="max-width: 360px; padding-bottom: 1%;">
+                {% if player.rarity == 'COMMON' %}
+                <div class="card mb-3" id="card_common" style="max-width: 300px; background-color: lightgray; border-width: 15px; border-radius: 15px;">
+                {% elif player.rarity == 'RARE' %}
+                <div class="card mb-3" id="card_rare" style="max-width: 300px; background-color: lightblue; border-width: 15px; border-radius: 15px;">
+                {% elif player.rarity == 'EPIC' %}
+                <div class="card mb-3" id="card_epic" style="max-width: 300px; background-color: lightpink; border-width: 15px; border-radius: 15px;">
+                {% else %}
+                <div class="card mb-3" id="card_legendary" style="max-width: 300px; background-color: gold; border-width: 15px; border-radius: 15px;">
+                {% endif %}
+                    <div class="card-header" style="text-align: center; color: blue;"><b>{{ player.name }}</b> <br><i style="color:black">[{{ player.rarity }}]</i></div>
+                        <div class="card-body" style="text-align: left;">
+                            <div class="container" style="text-align: center; margin-top: 10px; margin-bottom:10px; background-color: white; margin-bottom: 30px; border-radius: 5px;">
+                                <img src="{% static 'images/c_boxer.gif' %}" style="margin-top: 15px; margin-bottom:15px;">
+                            </div>
+                            <div class="row">
+                                <div class="col-4">
+                                    <b>life:</b>
+                                </div>
+                                <div class="col">
+                                    <div class="progress" style="height: 20px;">
+                                        <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" style="width: {% widthratio player.life 200 100 %}%" aria-valuenow="{% widthratio player.life 200 100 %}" aria-valuemin="0" aria-valuemax="100">
+                                            <b>{{ player.life }}</b>
+                                        </div>
+                                        <div class="progress-bar bg-success" role="progressbar" style="opacity: 0.2; width: {% widthratio plife_diff 200 100 %}%" aria-valuenow="{% widthratio plife_diff 200 100 %}" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-4">
+                                    <b>energy:</b>
+                                </div>
+                                <div class="col">
+                                    <div class="progress" style="height: 20px;">
+                                        <div class="progress-bar progress-bar-striped progress-bar-animated bg-warning" role="progressbar" style="width: {% widthratio player.energy 5 100 %}%" aria-valuenow="{% widthratio player.energy 5 100 %}" aria-valuemin="0" aria-valuemax="5">
+                                            <b>{{ player.energy }}</b>
+                                        </div>
+                                        <div class="progress-bar bg-warning" role="progressbar" style="opacity: 0.2; width: {% widthratio penergy_diff 5 100 %}%" aria-valuenow="{% widthratio penergy_diff 5 100 %}" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-4">
+                                    <b>power:</b>
+                                </div>
+                                <div class="col">
+                                    <div class="progress" style="height: 20px;">
+                                        <div class="progress-bar progress-bar-striped progress-bar-animated bg-danger" role="progressbar" style="width: {% widthratio player.power 10 100 %}%" aria-valuenow="{% widthratio player.power 10 100 %}" aria-valuemin="0" aria-valuemax="10">
+                                            <b>{{ player.power | floatformat:0 }}</b>
+                                        </div>
+                                        <div class="progress-bar bg-danger" role="progressbar" style="opacity: 0.2; width: {% widthratio ppower_diff 10 100 %}%" aria-valuenow="{% widthratio ppower_diff 10 100 %}" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-4">
+                                    <b>agility:</b>
+                                </div>
+                                <div class="col">
+                                    <div class="progress" style="height: 20px;">
+                                        <div class="progress-bar progress-bar-striped progress-bar-animated bg-info" role="progressbar" style="width: {% widthratio player.agility 10 100 %}%" aria-valuenow="{% widthratio player.agility 10 100 %}" aria-valuemin="0" aria-valuemax="10">
+                                            <b>{{ player.agility | floatformat:0 }}</b>
+                                        </div>
+                                        <div class="progress-bar bg-info" role="progressbar" style="opacity: 0.2; width: {% widthratio pagility_diff 10 100 %}%" aria-valuenow="{% widthratio pagility_diff 10 100 %}" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-4">
+                                    <b>block:</b>
+                                </div>
+                                <div class="col">
+                                    <div class="progress" style="height: 20px;">
+                                        <div class="progress-bar progress-bar-striped progress-bar-animated bg-black" role="progressbar" style="width: {% widthratio player.block 5 100 %}%" aria-valuenow="{% widthratio player.block 5 100 %}" aria-valuemin="0" aria-valuemax="10">
+                                            <b>{{ player.block }}</b>
+                                        </div>
+                                        <div class="progress-bar bg-black" role="progressbar" style="opacity: 0.2; width: {% widthratio pblock_diff 5 100 %}%" aria-valuenow="{% widthratio pblock_diff 5 100 %}" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        <div class="col-2" style="text-align: center; vertical-align: middle">
+            <h1>VS.</h1>
+            <div class="card text-dark border-warning mb-3" style="max-width: 18rem; margin-top: 10%;">
+                <div class="card-header">LAST ROUND:</div>
+                <div class="card-body" style="text-align: left">
+                    <span><b>~YOU:</b></span><br>
+                    <span>- strategy: <b>{{ last_round_log.player_strategy }}</b></span><br>
+                    <span>- damage done: <b>{{ last_round_log.player_dmg_done }}</b></span><br>
+                    <!-- <span>- blocked: <b>{{ last_round_log.player_block }}</b></span><br> -->
+                    <span>- life change: <b>{{ last_round_log.player_life_change }}</b></span><br>
+                    <hr>
+                    <span><b>~OPPONENT:</b></span><br>
+                    <span>- chose to: <b>{{ last_round_log.opponent_strategy }}</b></span><br>
+                    <span>- damage done: <b>{{ last_round_log.opponent_dmg_done }}</b></span><br>
+                    <!-- <span>- blocked: <b>{{ last_round_log.opponent_block }}</b></span><br> -->
+                    <span>- life change: <b>{{ last_round_log.opponent_life_change }}</b></span><br>
+                </div>
+              </div>
+        </div>
+
+        <div class="col" style="text-align: right;">
+            <div class="container" style="max-width: 360px; padding-bottom: 1%;">
+                {% if opponent.rarity == 'COMMON' %}
+                <div class="card mb-3" id="card_common" style="max-width: 300px; background-color: lightgray; border-width: 15px; border-radius: 15px;">
+                {% elif opponent.rarity == 'RARE' %}
+                <div class="card mb-3" id="card_rare" style="max-width: 300px; background-color: lightblue; border-width: 15px; border-radius: 15px;">
+                {% elif opponent.rarity == 'EPIC' %}
+                <div class="card mb-3" id="card_epic" style="max-width: 300px; background-color: lightpink; border-width: 15px; border-radius: 15px;">
+                {% else %}
+                <div class="card mb-3" id="card_legendary" style="max-width: 300px; background-color: gold; border-width: 15px; border-radius: 15px;">
+                {% endif %}
+                    <div class="card-header" style="text-align: center; color: red;"><b>{{ opponent.name }}</b> <br><i style="color:black">[{{ opponent.rarity }}]</i></div>
+                        <div class="card-body" style="text-align: left;">
+                            <div class="container" style="text-align: center; margin-top: 10px; margin-bottom:10px; background-color: white; margin-bottom: 30px; border-radius: 5px;">
+                                <img src="{% static 'images/c_boxer_o.gif' %}" style="margin-top: 15px; margin-bottom:15px;">
+                            </div>
+                            <div class="row">
+                                <div class="col-4">
+                                    <b>life:</b>
+                                </div>
+                                <div class="col">
+                                    <div class="progress" style="height: 20px;">
+                                        <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" style="width: {% widthratio opponent.life 200 100 %}%" aria-valuenow="{% widthratio opponent.life 200 100 %}" aria-valuemin="0" aria-valuemax="100">
+                                            <b>{{ opponent.life }}</b>
+                                        </div>
+                                        <div class="progress-bar bg-success" role="progressbar" style="opacity: 0.2; width: {% widthratio olife_diff 200 100 %}%" aria-valuenow="{% widthratio olife_diff 200 100 %}" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-4">
+                                    <b>energy:</b>
+                                </div>
+                                <div class="col">
+                                    <div class="progress" style="height: 20px;">
+                                        <div class="progress-bar progress-bar-striped progress-bar-animated bg-warning" role="progressbar" style="width: {% widthratio opponent.energy 5 100 %}%" aria-valuenow="{% widthratio opponent.energy 5 100 %}" aria-valuemin="0" aria-valuemax="5">
+                                            <b>{{ opponent.energy }}</b>
+                                        </div>
+                                        <div class="progress-bar bg-warning" role="progressbar" style="opacity: 0.2; width: {% widthratio oenergy_diff 5 100 %}%" aria-valuenow="{% widthratio oenergy_diff 5 100 %}" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-4">
+                                    <b>power:</b>
+                                </div>
+                                <div class="col">
+                                    <div class="progress" style="height: 20px;">
+                                        <div class="progress-bar progress-bar-striped progress-bar-animated bg-danger" role="progressbar" style="width: {% widthratio opponent.power 10 100 %}%" aria-valuenow="{% widthratio opponent.power 10 100 %}" aria-valuemin="0" aria-valuemax="10">
+                                            <b>{{ opponent.power | floatformat:0 }}</b>
+                                        </div>
+                                        <div class="progress-bar bg-danger" role="progressbar" style="opacity: 0.2; width: {% widthratio opower_diff 10 100 %}%" aria-valuenow="{% widthratio opower_diff 10 100 %}" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-4">
+                                    <b>agility:</b>
+                                </div>
+                                <div class="col">
+                                    <div class="progress" style="height: 20px;">
+                                        <div class="progress-bar progress-bar-striped progress-bar-animated bg-info" role="progressbar" style="width: {% widthratio opponent.agility 10 100 %}%" aria-valuenow="{% widthratio opponent.agility 10 100 %}" aria-valuemin="0" aria-valuemax="10">
+                                            <b>{{ opponent.agility | floatformat:0 }}</b>
+                                        </div>
+                                        <div class="progress-bar bg-info" role="progressbar" style="opacity: 0.2; width: {% widthratio oagility_diff 10 100 %}%" aria-valuenow="{% widthratio oagility_diff 10 100 %}" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-4">
+                                    <b>block:</b>
+                                </div>
+                                <div class="col">
+                                    <div class="progress" style="height: 20px;">
+                                        <div class="progress-bar progress-bar-striped progress-bar-animated bg-black" role="progressbar" style="width: {% widthratio opponent.block 5 100 %}%" aria-valuenow="{% widthratio opponent.block 5 100 %}" aria-valuemin="0" aria-valuemax="10">
+                                            <b>{{ opponent.block }}</b>
+                                        </div>
+                                        <div class="progress-bar bg-black" role="progressbar" style="opacity: 0.2; width: {% widthratio oblock_diff 5 100 %}%" aria-valuenow="{% widthratio oblock_diff 5 100 %}" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+{% if round_num == 13 %}
+
+    <div class="container" style="text-align: center; padding: 3%;">
+        <h4>Judges are counting the points!</h4>
+        <div class="container" style="padding: 3%">
+            <form action="{% url 'game:fight' %}" method="POST">
+                {% csrf_token %}
+                <button type="submit" value="attack" name="decision" class="btn btn-warning btn-lg">GO TO DECISION</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% else %}
+
+    <div class="container" style="text-align: center; padding: 3%;">
+        <h4>What's the strategy for this round?</h4>
+        <div class="container" style="padding: 3%">
+            <form action="{% url 'game:fight' %}" method="POST">
+                {% csrf_token %}
+                <button type="submit" value="attack" name="decision" class="btn btn-warning btn-lg">ATTACK</button>
+                <button type="submit" value="defend" name="decision" class="btn btn-warning btn-lg">DEFEND</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endif %}
+
+{% endblock body %}
