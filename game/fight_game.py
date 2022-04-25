@@ -80,61 +80,49 @@ class Fighter:
         self.draws = 0
 
     def punch(self, who):
+        if self.energy <= 0: # you lose 1 energy when you punch
+            self.energy = 0
+
+        else:
+            self.energy -= 1
+
+            x = 0.5/self.max_energy
+
+            decrease_value_power = self.max_power*x
+            decrease_value_agility = self.max_agility*x
+
+            self.power = self.power - decrease_value_power
+            self.agility = self.agility - decrease_value_agility
+
         # check how the punch connects
         player_agility = self.agility + Dice().roll_two()
         opponent_agility = who.agility + Dice().roll_two()
 
-        if player_agility < opponent_agility: # if opponent is faster player does only half of damage
-            damage = self.power * Dice().roll_two()
-            opponent_block_value = damage * who.block_factor
-            damage = ceil((damage - opponent_block_value)/2)
+        speed_ratio = player_agility/opponent_agility
 
-            if who.life - damage <= 0:
-                who.life = 0
-            else:
-                who.life -= damage
+        # players speed devided by opponents speed creates the ratio (range ~0,13 to ~7,3). everything above 1 means the player is faster and below means players is slower
+        # ratio below 0,5 means a MISS (0 damage)
+        # ratio above 4 means a DOUBLE (damage x2)
 
-            if self.energy <= 0:
-                self.energy = 0
+        if speed_ratio <= 0.5:
+            damage_factor = 0
 
-            else:
-                self.energy -= 1
+        elif speed_ratio >= 2:
+            damage_factor = 2
 
-                x = 0.5/self.max_energy
-
-                decrease_value_power = self.max_power*x
-                decrease_value_agility = self.max_agility*x
-
-                self.power = self.power - decrease_value_power
-                self.agility = self.agility - decrease_value_agility
-
-            return damage
-
-        else: # if opponent is slower player does full damage
-            damage = self.power * Dice().roll_two()
-            opponent_block_value = damage * who.block_factor
-            damage = ceil(damage - opponent_block_value)
-
-            if who.life - damage <= 0:
-                who.life = 0
-            else:
-                who.life -= damage
-
-            if self.energy <= 0:
-                self.energy = 0
-
-            else:
-                self.energy -= 1
-
-                x = 0.5/self.max_energy
-
-                decrease_value_power = self.max_power*x
-                decrease_value_agility = self.max_agility*x
-
-                self.power = self.power - decrease_value_power
-                self.agility = self.agility - decrease_value_agility
+        else:
+            damage_factor = speed_ratio
             
-            return damage
+        pure_damage = self.power * Dice().roll_two()
+
+        damage = ceil(pure_damage*damage_factor*(1-who.block_factor))
+
+        if who.life - damage <= 0:
+            who.life = 0
+        else:
+            who.life -= damage
+        
+        return damage
 
     def guard(self):
         damage = 0 # when player guards he does 0 damage
@@ -287,7 +275,7 @@ class Judge:
 
 class Fight:
     def opponent_logic(self):
-        strategies = ['attack', 'defend']
+        strategies = ['attack', 'attack', 'attack', 'attack', 'attack', 'attack', 'defend', 'defend', 'defend', 'defend']
         opponent_s = random.choice(strategies)
 
         return opponent_s
