@@ -2,13 +2,15 @@
 
 {% load static %}
 
+{% load game_extras %}
+
 {% block body %}
 
-<div class="container" style="text-align: center; padding-top: 5%">
-    <h4>NEW OPPONENT!</h4>
+<div class="container" style="text-align: center; padding-top: 2em;">
+    <h4>NEW OPPONENT! YOU WILL GET <img src="{% static 'images/coin.gif' %}" style="max-width: 35px;"><b>{{ reward }}</b> FOR THE WIN</h4>
 </div>
 
-<div class="container" style="max-width: 330px; padding-bottom: 1%;">
+<div class="container" style="max-width: 330px; padding-bottom: 1em;">
     {% if opponent.rarity == 'COMMON' %}
     <div class="card reveal mb-3" id="card_common" style="max-width: 300px; background-color: lightgray; border-width: 15px; border-radius: 15px;">
     {% elif opponent.rarity == 'RARE' %}
@@ -18,7 +20,9 @@
     {% else %}
     <div class="card reveal mb-3" id="card_legendary" style="max-width: 300px; background-color: gold; border-width: 15px; border-radius: 15px;">
     {% endif %}
-        <div class="card-header" style="text-align: center; color: red;"><b>{{ opponent.name }}</b> <br><i style="color:black">[{{ opponent.rarity }}]</i></div>
+        <div class="card-header" style="text-align: center; color: red;"><b>{{ opponent.name }}</b> <br>
+            <i style="color:black">[{{ opponent.rarity }}]</i>
+        </div>
             <div class="card-body" style="text-align: left;">
                 <div class="container" style="text-align: center; margin-top: 10px; margin-bottom:10px; background-color: white; margin-bottom: 30px; border-radius: 5px;">
                     <img src="{% static 'images/c_boxer_o.gif' %}" style="margin-top: 15px; margin-bottom:15px;">
@@ -90,14 +94,25 @@
 
 <div class="container" style="text-align: center">
     <h4>What you wanna do?</h4>
-    <div class="container" style="padding: 2%">
+    <div class="container" style="padding: 1em">
         <form action="{% url 'game:fight' %}" method="POST">
             {% csrf_token %}
-            <button type="submit" value="fight" name="strategy" class="btn btn-danger btn-lg">FIGHT</button>
-            <button type="submit" formaction="{% url 'game:introduction' %}" value="skip" name="strategy" class="btn btn-warning btn-lg">SKIP</button>
+            <span class="d-inline-block" tabindex="0" data-toggle="popover" data-trigger="hover focus" data-content="Once You click it the fight starts. You must win, otherwise a loss will be added to Your record." data-placement="left">
+                <button type="submit" value="fight" name="strategy" class="btn btn-danger btn-lg">FIGHT</button>
+            </span>
+            <span class="d-inline-block" tabindex="0" data-toggle="popover" data-trigger="hover focus" data-content="You can search for another opponent. It costs 1 coin." data-placement="right">
+                <button type="submit" formaction="{% url 'game:skip' %}" value="skip" name="strategy" class="btn btn-warning btn-lg">SKIP</button>
+            </span>
         </form>
     </div>
-    <p><span style="color: red">WARNING:</span> Once you click <span style="color: red">[FIGHT]</span>, the fight starts. You must win, otherwise a loss will be added to Your record.</p>
+    
 </div>
+
+<script>
+    var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-toggle="popover"]'))
+    var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+        return new bootstrap.Popover(popoverTriggerEl)
+    })
+</script>
 
 {% endblock body %}

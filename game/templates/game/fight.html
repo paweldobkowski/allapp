@@ -6,7 +6,7 @@
 
 {% block body %}
 
-<div class="container" style="max-width:fit-content; padding-top: 1%;">
+<div class="container" style="max-width:fit-content; padding-top: 0.1em;">
 {% if round_num == 13 %}
 
     <h1>FIGHT IS OVER!</h1>
@@ -18,7 +18,7 @@
 {% endif %}
 </div>
 
-<div class="container" style="padding-top: 3%;">
+<div class="container" style="padding-top: 2em;">
     <div class="row">
         <div class="col" style="text-align: left;">
             <div class="container" style="max-width: 360px; padding-bottom: 1%;">
@@ -127,7 +127,7 @@
         </div>
 
         <div class="col" style="text-align: right;">
-            <div class="container" style="max-width: 360px; padding-bottom: 1%;">
+            <div class="container" style="max-width: 360px;">
                 {% if opponent.rarity == 'COMMON' %}
                 <div class="card mb-3" id="card_common" style="max-width: 300px; background-color: lightgray; border-width: 15px; border-radius: 15px;">
                 {% elif opponent.rarity == 'RARE' %}
@@ -147,7 +147,7 @@
                                     <b>life:</b>
                                 </div>
                                 <div class="col">
-                                    <div class="progress" style="height: 20px;">
+                                    <div class="progress" style="max-height: 20px;">
                                         <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" style="width: {% widthratio opponent.life 200 100 %}%" aria-valuenow="{% widthratio opponent.life 200 100 %}" aria-valuemin="0" aria-valuemax="100">
                                             <b>{{ opponent.life }}</b>
                                         </div>
@@ -228,17 +228,28 @@
 
 {% else %}
 
-    <div class="container" style="text-align: center; padding: 3%;">
+    <div class="container" style="text-align: center; padding: 1em;">
         <h4>What's the strategy for this round?</h4>
-        <div class="container" style="padding: 3%">
+        <div class="container" style="padding: 1em">
             <form action="{% url 'game:fight' %}" method="POST">
                 {% csrf_token %}
-                <button type="submit" value="attack" name="decision" class="btn btn-warning btn-lg">ATTACK</button>
-                <button type="submit" value="defend" name="decision" class="btn btn-warning btn-lg">DEFEND</button>
+                <span class="d-inline-block" tabindex="0" data-toggle="popover" data-trigger="hover focus" data-content="ATTACK uses 1 energy. Less energy makes other stats go down." data-placement="left">
+                    <button type="submit" value="attack" name="decision" class="btn btn-warning btn-lg">ATTACK</button>
+                </span>
+                <span class="d-inline-block" tabindex="0" data-toggle="popover" data-trigger="hover focus" data-content="DEFEND recovers 1 energy and 20 life. Will also reduce the damage you take." data-placement="right">
+                    <button type="submit" value="defend" name="decision" class="btn btn-warning btn-lg">DEFEND</button>
+                </span>
             </form>
         </div>
     </div>
 </div>
+
+<script>
+    var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-toggle="popover"]'))
+    var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+        return new bootstrap.Popover(popoverTriggerEl)
+    })
+</script>
 
 {% endif %}
 

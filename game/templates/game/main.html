@@ -5,100 +5,126 @@
 {% block body %}
 
 {% if player %}
+<div class="row">
+    <div class="col-6">
+        <div class="container" style="text-align: center; padding-top: 2em">
+            <h4>YOUR FIGHTER:</h4>
+        </div>
+        <div class="container" style="max-width: 360px; padding-bottom: 1em;">
+            {% if player.rarity == 'COMMON' %}
+            <div class="card reveal mb-3" id="card_common" style="max-width: 300px; background-color: lightgray; border-width: 15px; border-radius: 15px;">
+            {% elif player.rarity == 'RARE' %}
+            <div class="card reveal mb-3" id="card_rare" style="max-width: 300px; background-color: lightblue; border-width: 15px; border-radius: 15px;">
+            {% elif player.rarity == 'EPIC' %}
+            <div class="card reveal mb-3" id="card_epic" style="max-width: 300px; background-color: lightpink; border-width: 15px; border-radius: 15px;">
+            {% else %}
+            <div class="card reveal mb-3" id="card_legendary" style="max-width: 300px; background-color: gold; border-width: 15px; border-radius: 15px;">
+            {% endif %}
+                <div class="card-header" style="text-align: center; color: red;"><b>{{ player.name }}</b> <br><i style="color:black">[{{ player.rarity }}]</i></div>
 
-<div class="container" style="text-align: center; padding-top: 5%">
-    <h4>YOUR FIGHTER:</h4>
-</div>
-<div class="container" style="max-width: 330px; padding-bottom: 1%;">
-    {% if player.rarity == 'COMMON' %}
-    <div class="card reveal mb-3" id="card_common" style="max-width: 300px; background-color: lightgray; border-width: 15px; border-radius: 15px;">
-    {% elif player.rarity == 'RARE' %}
-    <div class="card reveal mb-3" id="card_rare" style="max-width: 300px; background-color: lightblue; border-width: 15px; border-radius: 15px;">
-    {% elif player.rarity == 'EPIC' %}
-    <div class="card reveal mb-3" id="card_epic" style="max-width: 300px; background-color: lightpink; border-width: 15px; border-radius: 15px;">
-    {% else %}
-    <div class="card reveal mb-3" id="card_legendary" style="max-width: 300px; background-color: gold; border-width: 15px; border-radius: 15px;">
-    {% endif %}
-        <div class="card-header" style="text-align: center; color: red;"><b>{{ player.name }}</b> <br><i style="color:black">[{{ player.rarity }}]</i></div>
-            <div class="card-body" style="text-align: left;">
-                <div class="container" style="text-align: center; margin-top: 10px; margin-bottom:10px; background-color: white; margin-bottom: 30px; border-radius: 5px;">
-                    <img src="{% static 'images/c_boxer.gif' %}" style="margin-top: 15px; margin-bottom:15px;">
-                </div>
-                <div class="row">
-                    <div class="col-4">
-                        <b>life:</b>
-                    </div>
-                    <div class="col">
-                        <div class="progress" style="height: 20px;">
-                            <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" style="width: {% widthratio player.life 200 100 %}%" aria-valuenow="{% widthratio player.life 200 100 %}" aria-valuemin="0" aria-valuemax="100">
-                                <b>{{ player.life }}</b>
+                    <div class="card-body" style="text-align: left;">
+                        <div class="container" style="text-align: center; margin-top: 10px; margin-bottom:10px; background-color: white; margin-bottom: 30px; border-radius: 5px;">
+                            <img src="{% static 'images/c_boxer.gif' %}" style="margin-top: 15px; margin-bottom:15px;">
+                        </div>
+                        <div class="row">
+                            <div class="col-4">
+                                <b>life:</b>
+                            </div>
+                            <div class="col">
+                                <div class="progress" style="height: 20px;">
+                                    <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" style="width: {% widthratio player.life 200 100 %}%" aria-valuenow="{% widthratio player.life 200 100 %}" aria-valuemin="0" aria-valuemax="100">
+                                        <b>{{ player.life }}</b>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-4">
-                        <b>energy:</b>
-                    </div>
-                    <div class="col">
-                        <div class="progress" style="height: 20px;">
-                            <div class="progress-bar progress-bar-striped progress-bar-animated bg-warning" role="progressbar" style="width: {% widthratio player.energy 5 100 %}%" aria-valuenow="{% widthratio player.energy 5 100 %}" aria-valuemin="0" aria-valuemax="5">
-                                <b>{{ player.energy }}</b>
+                        <div class="row">
+                            <div class="col-4">
+                                <b>energy:</b>
+                            </div>
+                            <div class="col">
+                                <div class="progress" style="height: 20px;">
+                                    <div class="progress-bar progress-bar-striped progress-bar-animated bg-warning" role="progressbar" style="width: {% widthratio player.energy 5 100 %}%" aria-valuenow="{% widthratio player.energy 5 100 %}" aria-valuemin="0" aria-valuemax="5">
+                                        <b>{{ player.energy }}</b>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-4">
-                        <b>power:</b>
-                    </div>
-                    <div class="col">
-                        <div class="progress" style="height: 20px;">
-                            <div class="progress-bar progress-bar-striped progress-bar-animated bg-danger" role="progressbar" style="width: {% widthratio player.power 10 100 %}%" aria-valuenow="{% widthratio player.power 10 100 %}" aria-valuemin="0" aria-valuemax="10">
-                                <b>{{ player.power }}</b>
+                        <div class="row">
+                            <div class="col-4">
+                                <b>power:</b>
+                            </div>
+                            <div class="col">
+                                <div class="progress" style="height: 20px;">
+                                    <div class="progress-bar progress-bar-striped progress-bar-animated bg-danger" role="progressbar" style="width: {% widthratio player.power 10 100 %}%" aria-valuenow="{% widthratio player.power 10 100 %}" aria-valuemin="0" aria-valuemax="10">
+                                        <b>{{ player.power }}</b>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-4">
-                        <b>agility:</b>
-                    </div>
-                    <div class="col">
-                        <div class="progress" style="height: 20px;">
-                            <div class="progress-bar progress-bar-striped progress-bar-animated bg-info" role="progressbar" style="width: {% widthratio player.agility 10 100 %}%" aria-valuenow="{% widthratio player.agility 10 100 %}" aria-valuemin="0" aria-valuemax="10">
-                                <b>{{ player.agility }}</b>
+                        <div class="row">
+                            <div class="col-4">
+                                <b>agility:</b>
+                            </div>
+                            <div class="col">
+                                <div class="progress" style="height: 20px;">
+                                    <div class="progress-bar progress-bar-striped progress-bar-animated bg-info" role="progressbar" style="width: {% widthratio player.agility 10 100 %}%" aria-valuenow="{% widthratio player.agility 10 100 %}" aria-valuemin="0" aria-valuemax="10">
+                                        <b>{{ player.agility }}</b>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-4">
-                        <b>block:</b>
-                    </div>
-                    <div class="col">
-                        <div class="progress" style="height: 20px;">
-                            <div class="progress-bar progress-bar-striped progress-bar-animated bg-black" role="progressbar" style="width: {% widthratio player.block 5 100 %}%" aria-valuenow="{% widthratio player.block 5 100 %}" aria-valuemin="0" aria-valuemax="10">
-                                <b>{{ player.block }}</b>
+                        <div class="row">
+                            <div class="col-4">
+                                <b>block:</b>
+                            </div>
+                            <div class="col">
+                                <div class="progress" style="height: 20px;">
+                                    <div class="progress-bar progress-bar-striped progress-bar-animated bg-black" role="progressbar" style="width: {% widthratio player.block 5 100 %}%" aria-valuenow="{% widthratio player.block 5 100 %}" aria-valuemin="0" aria-valuemax="10">
+                                        <b>{{ player.block }}</b>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+            <div class="container" style="text-align: center;">
+                <h4>RECORD:</h4>
+                    wins: <b>{{ player.wins }}</b> (KO: <b>{{ player.ko }}</b>), losses: <b>{{ player.losses }}</b>, draws: <b>{{ player.draws }}</b></b>
+                <div class="container" style="padding: 2em">
+                    <form action="{% url 'game:introduction' %}" method="POST">
+                        {% csrf_token %}
+                        <button type="submit" value="GO FIGHT!" class="btn btn-warning btn-lg">GO FIGHT!</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="container" style="margin-top: 2em; border-style: dotted; border-width: 5px; border-radius: 5px;">
+                <h3 style="text-align: center; margin-top: 0.5em">[FIGHT CLUB RULES]</h3>
+                <div style="text-align: justify;">
+                    <p>You click "GO FIGHT" and You pick Your opponent. 
+                        The better the opponent (compared to You) the more coins You get. 
+                        Later You can exchange the coins for the skill points.
+                    </p>
+                </div>
+                    <hr>
+                    <h3 style="text-align: center; margin: 0.1em">[STATS BREAKDOWN]</h3>
+                <div style="text-align: justify;">
+                        <p>- <b>LIFE</b> is Your overall ability to take damage. You cannot increase it. The fighter is either tough or not.</p>
+                        <p>- <b>ENERGY</b> is Your conditioning. The more You have the slower You get tired.</p>
+                        <p>- <b>POWER</b> represents Your damage potential.</p>
+                        <p>- <b>AGILITY</b> is Your speed. Being faster gives You more damage and more chance to avoid taking damage.</p>
+                        <p>- <b>BLOCK</b> increases Your chance to block damage when You defend.</p>
+                </div>
+                    <hr>
+                    <h3 style="text-align: center; margin: 1em">BANK: <img src="{% static 'images/coin.gif' %}" style="max-width: 35px;"><b>{{ player.coins }}</b></h3>
+            </div>
         </div>
     </div>
 </div>
 
-<div class="container" style="text-align: center;">
-    <h4>RECORD:</h4>
-    wins: <b>{{ player.wins }}</b> (KO: <b>{{ player.ko }}</b>), losses: <b>{{ player.losses }}</b>, draws: <b>{{ player.draws }}</b>
-    <div class="container" style="padding: 3%">
-        <form action="{% url 'game:introduction' %}" method="POST">
-            {% csrf_token %}
-            <button type="submit" value="GO FIGHT!" class="btn btn-warning btn-lg">GO FIGHT!</button>
-        </form>
-    </div>
-</div>
 
 {% else %}
 

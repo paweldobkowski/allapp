@@ -35,6 +35,9 @@ class FighterModel(models.Model):
     losses = models.IntegerField(default=0)
     draws = models.IntegerField(default=0)
 
+    average = models.IntegerField()
+    coins = models.IntegerField(default=0)
+
     hexed_instance = models.TextField()
 
     def __str__(self):

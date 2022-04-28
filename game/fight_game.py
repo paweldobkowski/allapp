@@ -27,25 +27,49 @@ class Fighter:
 
         return name
 
-    def __init__(self, user_id='999999999'):
+    def divide_points(self, points):
+        points_list = [0, 1, 1 ,1] # block, energy, power, agility
+
+        while points > 0:
+            pos = random.randint(0,3)
+
+            if pos == 0 or pos == 1:
+                if points_list[pos] == 5:
+                    points_list[pos] = 5
+                else:
+                    points_list[pos] += 1
+                    points -= 1
+
+            else:
+                if points_list[pos] == 10:
+                    points_list[pos] = 10
+                else:
+                    points_list[pos] += 1
+                    points -= 1
+
+        return points_list
+
+    def __init__(self, user_id, points=10):
+        points_list = self.divide_points(points)
+        
         self.user_id = user_id
         self.name = self.get_name()
 
         self.life = random.randint(100, 200)
         self.max_life = self.life
 
-        self.power = random.randint(1, 10)
+        self.power = points_list[2]
         self.max_power = self.power
 
-        self.agility = random.randint(1, 10)
+        self.agility = points_list[3]
         self.max_agility = self.agility
 
-        self.block = random.randint(1, 5)
+        self.block = points_list[0]
         self.max_block = self.block
 
         self.block_factor = 0
 
-        self.energy = random.randint(3, 5)
+        self.energy = points_list[1]
         self.max_energy = self.energy
 
         rarity = None
@@ -56,21 +80,24 @@ class Fighter:
         agility_percent = (self.agility/10)*100
         block_percent = (self.block/5)*100
 
-        max_percent = (life_percent + energy_percent + power_percent + agility_percent + block_percent)/5
+        average = (life_percent*0.5 + energy_percent*0.5 + power_percent + agility_percent + block_percent*0.5)/5
 
+        self.average = average
+        self.coins = 0
+        
         # 0 - 70: COMMON
         # 70 - 80: RARE
         # 80 - 95: EPIC
         # 95 - 100: LEGENDARY
 
-        if max_percent <= 70:
+        if average <= 40:
             rarity = 'COMMON'
-        elif max_percent <= 80:
+        elif average <= 45:
             rarity = 'RARE'
-        elif max_percent <= 90:
+        elif average <= 53:
             rarity = 'EPIC'
         else:
-            rarity = 'LEGENDARY'  
+            rarity = 'LEGENDARY'
 
         self.rarity = rarity
 
@@ -78,6 +105,9 @@ class Fighter:
         self.ko = 0
         self.losses = 0
         self.draws = 0
+
+    def buy_stats(self):
+        pass
 
     def punch(self, who):
         if self.energy <= 0: # you lose 1 energy when you punch
@@ -168,6 +198,56 @@ class Fighter:
         
         self.block_factor = 0
 
+class Opponent(Fighter):
+    def __init__(self, user_id='999999999'):
+        self.user_id = user_id
+        self.name = self.get_name()
+
+        self.life = random.randint(100, 200)
+        self.max_life = self.life
+
+        self.power = random.randint(1, 10)
+        self.max_power = self.power
+
+        self.agility = random.randint(1, 10)
+        self.max_agility = self.agility
+
+        self.block = random.randint(1, 5)
+        self.max_block = self.block
+
+        self.block_factor = 0
+
+        self.energy = random.randint(3, 5)
+        self.max_energy = self.energy
+
+        rarity = None
+
+        life_percent = (self.life/200)*100
+        energy_percent = (self.energy/5)*100
+        power_percent = (self.power/10)*100
+        agility_percent = (self.agility/10)*100
+        block_percent = (self.block/5)*100
+
+        average = (life_percent*0.5 + energy_percent*0.5 + power_percent + agility_percent + block_percent*0.5)/5
+
+        self.average = average
+
+        # 0 - 70: COMMON
+        # 70 - 80: RARE
+        # 80 - 95: EPIC
+        # 95 - 100: LEGENDARY
+
+        if average <= 40:
+            rarity = 'COMMON'
+        elif average <= 45:
+            rarity = 'RARE'
+        elif average <= 53:
+            rarity = 'EPIC'
+        else:
+            rarity = 'LEGENDARY'
+
+        self.rarity = rarity
+
 class Utilities:
     def hex_data(self, data):
         hexed_data = pickle.dumps(data).hex()
@@ -199,6 +279,7 @@ class Referee:
             round_num = game_state['round_num']
 
             game_state['is_over'] = True
+            game_state['player']['knocked_out'] = True
             game_state['end_info']['who_won'] = 'opponent'
             game_state['end_info']['won_by'] = f'KNOCK OUT IN ROUND NUMBER {round_num}'
 
@@ -212,6 +293,7 @@ class Referee:
             round_num = game_state['round_num']
 
             game_state['is_over'] = True
+            game_state['opponent']['knocked_out'] = True
             game_state['end_info']['who_won'] = 'player'
             game_state['end_info']['won_by'] = f'KNOCK OUT IN ROUND NUMBER {round_num}'
 
@@ -245,7 +327,7 @@ class Judge:
         
         return total_score
 
-    def player_record_update(self, request, user_id, win=None, by_ko=False):
+    def player_record_update(self, request, user_id, reward=0, win=None, by_ko=False):
         player = FighterModel.objects.filter(user_id=user_id)
         player = player[0]
 
@@ -255,6 +337,8 @@ class Judge:
         if win:
             player.wins += 1
             player_instance.wins += 1
+            player.coins += reward
+            player_instance.coins += reward
 
             if by_ko:
                 player.ko += 1
@@ -279,6 +363,18 @@ class Fight:
         opponent_s = random.choice(strategies)
 
         return opponent_s
+    
+    def calculate_reward(self, o_avg, p_avg):
+        x = o_avg - p_avg
+        coins = 2**(x/2)*10
+
+        if coins <= 1:
+            coins = 1
+
+        else:
+            coins = round(coins, 1)
+
+        return coins
 
     def pre_fight(self, request):
 
@@ -288,7 +384,9 @@ class Fight:
         # put 'game_is': 'on' in session so we know player is playing
 
         player = Utilities().get_thing_from_session(request, 'player')
-        opponent = Fighter()
+        opponent = Opponent()
+
+        reward = round(self.calculate_reward(opponent.average, player.average), 1)
 
         game_state = {
             'round_num': 0,
@@ -317,12 +415,13 @@ class Fight:
 
             'player': {
                 'instance': player,
-                'knocked_down': 0,
+                'knocked_out': False,
             },
 
             'opponent': {
                 'instance': opponent,
-                'knocked_down': 0,
+                'knocked_out': False,
+                'reward': reward,
             },
         }
 
@@ -334,6 +433,13 @@ class Fight:
         game_state = Utilities().get_thing_from_session(request, 'game_state')
         round_num = game_state['round_num']
         
+        # getting player and opponent class instances ready
+        # FOR PLAYER:
+        player = game_state['player']['instance']
+
+        # FOR OPPONENT:
+        opponent = game_state['opponent']['instance']
+
         #START
         if round_num == 0: # FIRST ROUND
             game_state['round_num'] = 1
@@ -342,16 +448,9 @@ class Fight:
 
             return game_state
 
-        elif round_num in range(1,13):
+        elif round_num in range(1,13) and not game_state['is_over']:
             player_strategy = player_strategy
             opponent_strategy = self.opponent_logic()
-
-            # getting player and opponent class instances ready
-            # FOR PLAYER:
-            player = game_state['player']['instance']
-
-            # FOR OPPONENT:
-            opponent = game_state['opponent']['instance']
 
             player_performance = 0 # WE SET BOTH PERFORMANCES TO 0 TO RESET EVERYTIME AND IN CASE A KNOCKOUT
             opponent_performance = 0
@@ -379,33 +478,34 @@ class Fight:
                     knock_out = Referee().check_for_knockout(request, game_state, player, opponent)
                     if knock_out:
 
-                        user_id = request.session.get('user_id')
-                        Judge().player_record_update(user_id=user_id, request=request, win=True, by_ko=True)
+                        user_id = request.session.get('user_id') # get logged user_id
+                        reward = game_state['opponent']['reward']
+                        Judge().player_record_update(user_id=user_id, request=request, reward=reward, win=True)
                         return knock_out
 
                     opponent_performance = opponent.punch(player)
                     knock_out = Referee().check_for_knockout(request, game_state, player, opponent)
                     if knock_out:
                         
-                        user_id = request.session.get('user_id')
-                        Judge().player_record_update(user_id=user_id, request=request, win=False)
                         return knock_out
 
                 else:                                                   # opponent hits first
                     opponent_performance = opponent.punch(player)
                     knock_out = Referee().check_for_knockout(request, game_state, player, opponent)
                     if knock_out:
-                        
-                        user_id = request.session.get('user_id')
-                        Judge().player_record_update(user_id=user_id, request=request, win=False)
+
+                        user_id = request.session.get('user_id') # get logged user_id
+                        reward = game_state['opponent']['reward']
+                        Judge().player_record_update(user_id=user_id, request=request, reward=reward, win=False)
                         return knock_out
 
                     player_performance = player.punch(opponent)
                     knock_out = Referee().check_for_knockout(request, game_state, player, opponent)
                     if knock_out:
 
-                        user_id = request.session.get('user_id')
-                        Judge().player_record_update(user_id=user_id, request=request, win=True, by_ko=True)
+                        user_id = request.session.get('user_id') # get logged user_id
+                        reward = game_state['opponent']['reward']
+                        Judge().player_record_update(user_id=user_id, request=request, reward=reward, win=True)
                         return knock_out
 
             elif player_strategy == 'defend' and opponent_strategy == 'defend':
@@ -421,9 +521,10 @@ class Fight:
                 opponent_performance = opponent.punch(player)
                 knock_out = Referee().check_for_knockout(request, game_state, player, opponent)
                 if knock_out:
-                    
-                    user_id = request.session.get('user_id')
-                    Judge().player_record_update(user_id=user_id, request=request, win=False)
+
+                    user_id = request.session.get('user_id') # get logged user_id
+                    reward = game_state['opponent']['reward']
+                    Judge().player_record_update(user_id=user_id, request=request, reward=reward, win=False)
                     return knock_out
 
                 player.recover()
@@ -434,8 +535,9 @@ class Fight:
                 knock_out = Referee().check_for_knockout(request, game_state, player, opponent)
                 if knock_out:
 
-                    user_id = request.session.get('user_id')
-                    Judge().player_record_update(user_id=user_id, request=request, win=True, by_ko=True)
+                    user_id = request.session.get('user_id') # get logged user_id
+                    reward = game_state['opponent']['reward']
+                    Judge().player_record_update(user_id=user_id, request=request, reward=reward, win=True)
                     return knock_out
 
                 opponent.recover()
@@ -445,9 +547,6 @@ class Fight:
 
             player_life_change = life_after_round_player - life_before_round_player
             opponent_life_change = life_after_round_opponent - life_before_round_opponent
-
-            player_block = 'all' if opponent_strategy == 'attack' and opponent_performance == 0 else 'some'
-            opponent_block = 'all' if player_strategy == 'attack' and player_performance == 0 else 'some'
 
             # LAST ROUND LOG
             last_round_log = {
@@ -500,12 +599,13 @@ class Fight:
 
             player_score = game_state['total_score']['player_score']
             opponent_score = game_state['total_score']['opponent_score']
+            reward = game_state['opponent']['reward']
 
             if player_score > opponent_score:
                 game_state['end_info']['who_won'] = 'player'
                 game_state['end_info']['won_by'] = 'UNANIMOUS DECISION'
 
-                Judge().player_record_update(user_id=user_id, request=request, win=True)
+                Judge().player_record_update(user_id=user_id, request=request, reward=reward, win=True)
 
                 Utilities().put_thing_in_session(request, game_state, 'game_state')
 

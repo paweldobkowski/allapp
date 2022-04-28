@@ -6,7 +6,7 @@ import os.path
 import random, json, pickle
 
 from .models import FighterModel
-from .fight_game import Fighter, Fight, Utilities
+from .fight_game import Fighter, Fight, Judge, Utilities
 
 # Create your views here.
 
@@ -20,7 +20,7 @@ def main(request):
     user_id = request.session.get('user_id')
     
     if request.method == "POST": # WHEN USER CLAIMS THE FIGHTER
-        player = Fighter(user_id)
+        player = Fighter(user_id, points=10)
 
         Utilities().put_thing_in_session(request, player, 'player') # putting player class instance in session
 
@@ -43,6 +43,8 @@ def main(request):
             energy=player.energy,
             max_energy=player.max_energy,
 
+            average=player.average,
+
             rarity=player.rarity,
 
             hexed_instance = Utilities().hex_data(player) # in order to be able to access class, not only model
@@ -52,24 +54,16 @@ def main(request):
 
         return redirect(reverse('game:main'))
 
-    hexed_player = request.session.get('player')
-
-    if hexed_player:
-        player = Utilities().unhex_data(hexed_player)
-        print('player z sesji')
-
-    else:
+    try:
         player = FighterModel.objects.filter(user_id=user_id)
-        print('player z bazy')
+        player_instance = player[0].hexed_instance
 
-        try:
-            player_instance = player[0].hexed_instance
-            Utilities().put_thing_in_session(request, player_instance, 'player', False)
+        Utilities().put_thing_in_session(request, player_instance, 'player', False)
 
-            player = Utilities().unhex_data(player[0].hexed_instance)
+        player = Utilities().unhex_data(player[0].hexed_instance)
 
-        except:
-            player = None
+    except:
+        player = None
 
     context = {
         'player': player,
@@ -87,19 +81,27 @@ def introduction(request):
         return redirect(reverse('game:fight'))
 
     if request.method == "POST":
-        game_state = Fight().pre_fight(request)
+        Fight().pre_fight(request)
 
         return redirect(reverse('game:introduction'))
 
     else:
+        hexed_player = request.session.get('player')
+
+        if hexed_player:
+            player = Utilities().unhex_data(hexed_player)
+
         if not request.session.get('game_state'):
             return redirect(reverse('game:main'))
 
         game_state = Utilities().get_thing_from_session(request, 'game_state')
         opponent = game_state['opponent']['instance']
+        reward = game_state['opponent']['reward']
 
         context = {
+            'player': player,
             'opponent': opponent,
+            'reward': reward,
             'game': 'active',
             'is_logged': request.session.get('is_logged'),
         }
@@ -125,7 +127,6 @@ def fight(request):
         return redirect(reverse('game:main'))
     
     if game_state['is_over']:
-        Utilities().put_thing_in_session(request, game_state, 'game_state')
 
         return redirect(reverse('game:summary'))
 
@@ -183,7 +184,7 @@ def summary(request):
     is_over = game_state['is_over']
 
     if is_over:
-        Utilities().put_thing_in_session(request, False, 'opponent_selected', False) # ENEMY IS DONE SO WE CAN UNSELECT
+        Utilities().put_thing_in_session(request, False, 'opponent_selected', False) # FIGHT IS OVER SO WE CAN UNSELECT THE OPPONENT
 
         if request.method == 'POST':
             return redirect(reverse('game:summary'))
@@ -229,6 +230,10 @@ def summary(request):
     elif request.session.get('opponent_selected'):
         return redirect(reverse('game:fight'))
 
+def skip(request):
+    Fight().pre_fight(request)
+
+    return redirect(reverse('game:introduction'))
 
 def clear(request):
     FighterModel.objects.all().delete()
