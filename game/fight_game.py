@@ -378,11 +378,6 @@ class Fight:
 
     def pre_fight(self, request):
 
-        # pre_fight method has three objectives:
-        # create opponent
-        # put opponent and player in the 'game_state' object, hex it and store it in the session (so we avoid querying the database)
-        # put 'game_is': 'on' in session so we know player is playing
-
         player = Utilities().get_thing_from_session(request, 'player')
         opponent = Opponent()
 
