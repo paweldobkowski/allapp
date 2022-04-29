@@ -192,13 +192,14 @@ def summary(request):
         player = game_state['player']['instance']
         player_score = game_state['total_score']['player_score']
         opponent_score = game_state['total_score']['opponent_score']
+        reward = game_state['opponent']['reward']
 
         who_won = game_state['end_info']['who_won']
         won_by = game_state['end_info']['won_by']
 
         j1_score = {
-        'p_s': int(player_score/3),
-        'o_s': int(opponent_score/3),
+            'p_s': int(player_score/3),
+            'o_s': int(opponent_score/3),
         }
 
         j2_score = {
@@ -218,6 +219,7 @@ def summary(request):
             'who_won': who_won,
             'won_by': won_by,
             'player': player,
+            'reward': reward,
             'game': 'active',
             'is_logged': request.session.get('is_logged'),
         }
