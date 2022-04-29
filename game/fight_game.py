@@ -327,7 +327,7 @@ class Judge:
         
         return total_score
 
-    def player_record_update(self, request, user_id, reward=0, win=None, by_ko=False):
+    def player_record_update(self, request, user_id, game_state, reward=0, win=None, by_ko=False):
         player = FighterModel.objects.filter(user_id=user_id)
         player = player[0]
 
@@ -340,7 +340,7 @@ class Judge:
             player.coins += reward
             player_instance.coins += reward
 
-            if by_ko:
+            if game_state['opponent']['knocked_out']:
                 player.ko += 1
                 player_instance.ko += 1
 
@@ -476,7 +476,7 @@ class Fight:
 
                         user_id = request.session.get('user_id') # get logged user_id
                         reward = game_state['opponent']['reward']
-                        Judge().player_record_update(user_id=user_id, request=request, reward=reward, win=True)
+                        Judge().player_record_update(user_id=user_id, request=request, reward=reward, game_state=game_state, win=True)
                         return knock_out
 
                     opponent_performance = opponent.punch(player)
@@ -492,7 +492,7 @@ class Fight:
 
                         user_id = request.session.get('user_id') # get logged user_id
                         reward = game_state['opponent']['reward']
-                        Judge().player_record_update(user_id=user_id, request=request, reward=reward, win=False)
+                        Judge().player_record_update(user_id=user_id, request=request, reward=reward, game_state=game_state, win=False)
                         return knock_out
 
                     player_performance = player.punch(opponent)
@@ -501,7 +501,7 @@ class Fight:
 
                         user_id = request.session.get('user_id') # get logged user_id
                         reward = game_state['opponent']['reward']
-                        Judge().player_record_update(user_id=user_id, request=request, reward=reward, win=True)
+                        Judge().player_record_update(user_id=user_id, request=request, reward=reward, game_state=game_state, win=True)
                         return knock_out
 
             elif player_strategy == 'defend' and opponent_strategy == 'defend':
@@ -520,7 +520,7 @@ class Fight:
 
                     user_id = request.session.get('user_id') # get logged user_id
                     reward = game_state['opponent']['reward']
-                    Judge().player_record_update(user_id=user_id, request=request, reward=reward, win=False)
+                    Judge().player_record_update(user_id=user_id, request=request, reward=reward, game_state=game_state, win=False)
                     return knock_out
 
                 player.recover()
@@ -533,7 +533,7 @@ class Fight:
 
                     user_id = request.session.get('user_id') # get logged user_id
                     reward = game_state['opponent']['reward']
-                    Judge().player_record_update(user_id=user_id, request=request, reward=reward, win=True)
+                    Judge().player_record_update(user_id=user_id, request=request, reward=reward, game_state=game_state, win=True)
                     return knock_out
 
                 opponent.recover()
@@ -601,7 +601,7 @@ class Fight:
                 game_state['end_info']['who_won'] = 'player'
                 game_state['end_info']['won_by'] = 'UNANIMOUS DECISION'
 
-                Judge().player_record_update(user_id=user_id, request=request, reward=reward, win=True)
+                Judge().player_record_update(user_id=user_id, request=request, reward=reward, game_state=game_state, win=True)
 
                 Utilities().put_thing_in_session(request, game_state, 'game_state')
 
@@ -611,7 +611,7 @@ class Fight:
                 game_state['end_info']['who_won'] = 'opponent'
                 game_state['end_info']['won_by'] = 'UNANIMOUS DECISION'
 
-                Judge().player_record_update(user_id=user_id, request=request, win=False)
+                Judge().player_record_update(user_id=user_id, request=request, game_state=game_state, win=False)
 
                 Utilities().put_thing_in_session(request, game_state, 'game_state')
 
@@ -621,7 +621,7 @@ class Fight:
                 game_state['end_info']['who_won'] = None
                 game_state['end_info']['won_by'] = 'UNANIMOUS DECISION'
 
-                Judge().player_record_update(user_id=user_id, request=request)
+                Judge().player_record_update(user_id=user_id, game_state=game_state, request=request)
 
                 Utilities().put_thing_in_session(request, game_state, 'game_state')
 
