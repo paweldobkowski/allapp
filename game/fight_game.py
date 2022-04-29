@@ -106,6 +106,8 @@ class Fighter:
         self.losses = 0
         self.draws = 0
 
+        self.injury = 'none'
+
     def buy_stats(self):
         pass
 
@@ -197,6 +199,15 @@ class Fighter:
             self.agility = self.agility + decrease_value_agility
         
         self.block_factor = 0
+    
+    def recover_after_loss(self):
+        if self.injury == 'hard':
+            self.coins = self.coins - self.coins/2
+        
+        elif self.injury == 'light':
+            self.coins = self.coins - self.coins/3
+
+        self.injury = 'none'
 
 class Opponent(Fighter):
     def __init__(self, user_id='999999999'):
@@ -301,6 +312,34 @@ class Referee:
 
             return game_state
         
+
+class Doctor:
+    def recover_after_loss(self, request, user_id):
+        player = FighterModel.objects.filter(user_id=user_id)
+        player = player[0]
+
+        hexed_player_instance = player.hexed_instance
+        player_instance = Utilities().unhex_data(hexed_player_instance)
+
+        if player.injury == 'hard':
+            if player.coins != 0:
+                player.coins = round(player.coins - player.coins/2)
+                player_instance.coins = round(player_instance.coins - player_instance.coins/2)
+
+        elif player.injury == 'light':
+            if player.coins != 0:
+                player.coins = round(player.coins - player.coins/3)
+                player_instance.coins = round(player_instance.coins - player_instance.coins/3)
+
+        player.injury = 'none'
+        player_instance.injury = 'none'
+        
+        player.hexed_instance = Utilities().hex_data(player_instance)        
+        player.save()
+
+        print(player.injury)
+
+
 class Judge:
     def score_round(self, player_performance, opponent_performance):
         if player_performance == opponent_performance:
@@ -334,9 +373,12 @@ class Judge:
         hexed_player_instance = player.hexed_instance
         player_instance = Utilities().unhex_data(hexed_player_instance)
 
+        loss_by_ko = game_state['player']['knocked_out']
+
         if win:
             player.wins += 1
             player_instance.wins += 1
+
             player.coins += reward
             player_instance.coins += reward
 
@@ -345,14 +387,24 @@ class Judge:
                 player_instance.ko += 1
 
         elif win == False:
+            player.injury = 'light'
+            player_instance.injury = 'light'
+
             player.losses += 1
             player_instance.losses += 1
 
+            if loss_by_ko:
+                player.injury = 'hard'
+                player_instance.injury = 'hard'
+
         elif win == None:
+            player.injury = 'light'
+            player_instance.injury = 'light'
+
             player.draws += 1
             player_instance.draws += 1
 
-        Utilities().put_thing_in_session(request, player_instance, 'player')
+        print(f'player injury: {player_instance.injury}')
 
         player.hexed_instance = Utilities().hex_data(player_instance)        
         player.save()
@@ -365,14 +417,15 @@ class Fight:
         return opponent_s
     
     def calculate_reward(self, o_avg, p_avg):
-        x = o_avg - p_avg
-        coins = 2**(x/2)*10
+        # x = o_avg - p_avg
+        # coins = 2**(x/2)*10
 
-        if coins <= 1:
-            coins = 1
+        # if coins <= 1:
+        #     coins = 1
 
-        else:
-            coins = round(coins, 1)
+        # else:
+        #     coins = round(coins, 1)
+        coins = 1.2**o_avg
 
         return coins
 
@@ -383,6 +436,7 @@ class Fight:
 
         reward = round(self.calculate_reward(opponent.average, player.average))
         print(reward)
+        print(player.injury)
 
         game_state = {
             'round_num': 0,
@@ -482,7 +536,10 @@ class Fight:
                     opponent_performance = opponent.punch(player)
                     knock_out = Referee().check_for_knockout(request, game_state, player, opponent)
                     if knock_out:
-                        
+
+                        user_id = request.session.get('user_id') # get logged user_id
+                        reward = game_state['opponent']['reward']
+                        Judge().player_record_update(user_id=user_id, request=request, reward=reward, game_state=game_state, win=False)
                         return knock_out
 
                 else:                                                   # opponent hits first

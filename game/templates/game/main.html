@@ -20,7 +20,7 @@
             {% else %}
             <div class="card reveal mb-3" id="card_legendary" style="max-width: 300px; background-color: gold; border-width: 15px; border-radius: 15px;">
             {% endif %}
-                <div class="card-header" style="text-align: center; color: red;"><b>{{ player.name }}</b> <br><i style="color:black">[{{ player.rarity }}]</i></div>
+                <div class="card-header" style="text-align: center; color: blue;"><b>{{ player.name }}</b> <br><i style="color:black">[{{ player.rarity }}]</i></div>
 
                     <div class="card-body" style="text-align: left;">
                         <div class="container" style="text-align: center; margin-top: 10px; margin-bottom:10px; background-color: white; margin-bottom: 30px; border-radius: 5px;">
@@ -92,12 +92,36 @@
             <div class="container" style="text-align: center;">
                 <h4>RECORD:</h4>
                     wins: <b>{{ player.wins }}</b> (KO: <b>{{ player.ko }}</b>), losses: <b>{{ player.losses }}</b>, draws: <b>{{ player.draws }}</b></b>
+
+{% if player.injury == 'light' %}
+
+                    <div class="container" style="padding: 2em">
+                        <form action="{% url 'game:recover' %}" method="POST">
+                            {% csrf_token %}
+                            <button type="submit" value="RECOVER AFTER KO" class="btn btn-danger btn-lg">RECOVER <img src="{% static 'images/coin.gif' %}" style="max-width: 30px;"><b>{% widthratio player.coins 3 1 %}</b></button>
+                        </form>
+                    </div>
+
+{% elif player.injury == 'hard' %}
+
+                <div class="container" style="padding: 2em">
+                    <form action="{% url 'game:recover' %}" method="POST">
+                        {% csrf_token %}
+                        <button type="submit" value="RECOVER AFTER LOSS OR DRAW" class="btn btn-danger btn-lg">RECOVER <img src="{% static 'images/coin.gif' %}" style="max-width: 30px;"><b>{% widthratio player.coins 2 1 %}</b></button>
+                    </form>
+                </div>
+
+{% elif player.injury == 'none' %}
+
                 <div class="container" style="padding: 2em">
                     <form action="{% url 'game:introduction' %}" method="POST">
                         {% csrf_token %}
                         <button type="submit" value="GO FIGHT!" class="btn btn-warning btn-lg">GO FIGHT!</button>
                     </form>
                 </div>
+
+{% endif %}
+
             </div>
         </div>
         <div class="col-4">

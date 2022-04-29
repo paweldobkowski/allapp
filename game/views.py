@@ -6,7 +6,7 @@ import os.path
 import random, json, pickle
 
 from .models import FighterModel
-from .fight_game import Fighter, Fight, Judge, Utilities
+from .fight_game import Fighter, Fight, Judge, Utilities, Doctor
 
 # Create your views here.
 
@@ -237,8 +237,19 @@ def skip(request):
 
     return redirect(reverse('game:introduction'))
 
+def recover_after_loss(request):
+    if request.session.get('is_logged') != True:
+        return redirect('start')
+
+    if request.method == 'POST':
+        user_id = request.session.get('user_id')
+        Doctor().recover_after_loss(request, user_id=user_id)
+
+    return redirect(reverse('game:main'))
+
 def clear(request):
     FighterModel.objects.all().delete()
+
     try:
         del request.session['player']
         del request.session['opponent']

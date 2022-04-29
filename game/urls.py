@@ -9,5 +9,6 @@ urlpatterns = [
     path('skip/', views.skip, name='skip'),
     path('fight/', views.fight, name='fight'),
     path('summary/', views.summary, name='summary'),
+    path('recover/', views.recover_after_loss, name='recover'),
     path('c/', views.clear, name='clear'),
 ]
