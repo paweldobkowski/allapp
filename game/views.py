@@ -20,7 +20,7 @@ def main(request):
     user_id = request.session.get('user_id')
     
     if request.method == "POST": # WHEN USER CLAIMS THE FIGHTER
-        player = Fighter(user_id, points=10)
+        player = Fighter(user_id, points=15)
 
         Utilities().put_thing_in_session(request, player, 'player') # putting player class instance in session
 

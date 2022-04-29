@@ -381,7 +381,8 @@ class Fight:
         player = Utilities().get_thing_from_session(request, 'player')
         opponent = Opponent()
 
-        reward = round(self.calculate_reward(opponent.average, player.average), 1)
+        reward = round(self.calculate_reward(opponent.average, player.average))
+        print(reward)
 
         game_state = {
             'round_num': 0,
