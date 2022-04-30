@@ -74,7 +74,7 @@ class Fighter:
 
         rarity = None
 
-        self.coins = 100000000
+        self.coins = 0
 
         life_percent = (self.life/200)*100
         energy_percent = (self.energy/5)*100
