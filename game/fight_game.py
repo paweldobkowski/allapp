@@ -74,6 +74,8 @@ class Fighter:
 
         rarity = None
 
+        self.coins = 100000000
+
         life_percent = (self.life/200)*100
         energy_percent = (self.energy/5)*100
         power_percent = (self.power/10)*100
@@ -83,12 +85,6 @@ class Fighter:
         average = (life_percent*0.5 + energy_percent*0.5 + power_percent + agility_percent + block_percent*0.5)/5
 
         self.average = average
-        self.coins = 0
-        
-        # 0 - 70: COMMON
-        # 70 - 80: RARE
-        # 80 - 95: EPIC
-        # 95 - 100: LEGENDARY
 
         if average <= 40:
             rarity = 'COMMON'
@@ -107,9 +103,6 @@ class Fighter:
         self.draws = 0
 
         self.injury = 'none'
-
-    def buy_stats(self):
-        pass
 
     def punch(self, who):
         if self.energy <= 0: # you lose 1 energy when you punch
@@ -199,15 +192,6 @@ class Fighter:
             self.agility = self.agility + decrease_value_agility
         
         self.block_factor = 0
-    
-    def recover_after_loss(self):
-        if self.injury == 'hard':
-            self.coins = self.coins - self.coins/2
-        
-        elif self.injury == 'light':
-            self.coins = self.coins - self.coins/3
-
-        self.injury = 'none'
 
 class Opponent(Fighter):
     def __init__(self, user_id='999999999'):
@@ -312,6 +296,68 @@ class Referee:
 
             return game_state
         
+class Trainer:
+    def add_one_point(self, request, user_id, stat):
+        player = FighterModel.objects.filter(user_id=user_id)
+        player = player[0]
+
+        hexed_player_instance = player.hexed_instance
+        player_instance = Utilities().unhex_data(hexed_player_instance)
+
+        # cost of a single point
+        point_cost = round((1.2**(player.average+5))*4)
+
+        if player.coins >= point_cost:
+            if stat == 'power':
+                player_instance.power += 1
+                player_instance.max_power = player_instance.power
+                player.power = player_instance.power
+                player.max_power = player.power
+            elif stat == 'energy':
+                player_instance.energy += 1
+                player_instance.max_energy = player_instance.energy
+                player.energy = player_instance.energy
+                player.max_energy = player.energy
+            elif stat == 'agility':
+                player_instance.agility += 1
+                player_instance.max_agility = player_instance.agility
+                player.agility = player_instance.agility
+                player.max_agility = player.agility
+            elif stat == 'block':
+                player_instance.block += 1
+                player_instance.max_block = player_instance.block
+                player.block = player_instance.block
+                player.max_block = player.block
+
+            player.coins -= point_cost
+            player_instance.coins -= point_cost
+
+            life_percent = (player.life/200)*100
+            energy_percent = (player.energy/5)*100
+            power_percent = (player.power/10)*100
+            agility_percent = (player.agility/10)*100
+            block_percent = (player.block/5)*100
+
+            average = (life_percent*0.5 + energy_percent*0.5 + power_percent + agility_percent + block_percent*0.5)/5
+
+            player.average = average
+            player_instance.average = average
+
+            if average <= 40:
+                rarity = 'COMMON'
+            elif average <= 45:
+                rarity = 'RARE'
+            elif average <= 53:
+                rarity = 'EPIC'
+            else:
+                rarity = 'LEGENDARY'
+
+            player.rarity = rarity
+
+            player_instance.rarity = rarity
+
+            player.hexed_instance = Utilities().hex_data(player_instance)        
+            player.save()
 
 class Doctor:
     def recover_after_loss(self, request, user_id):
@@ -336,9 +382,6 @@ class Doctor:
         
         player.hexed_instance = Utilities().hex_data(player_instance)        
         player.save()
-
-        print(player.injury)
-
 
 class Judge:
     def score_round(self, player_performance, opponent_performance):
@@ -417,14 +460,6 @@ class Fight:
         return opponent_s
     
     def calculate_reward(self, o_avg, p_avg):
-        # x = o_avg - p_avg
-        # coins = 2**(x/2)*10
-
-        # if coins <= 1:
-        #     coins = 1
-
-        # else:
-        #     coins = round(coins, 1)
         coins = 1.2**o_avg
 
         return coins
@@ -435,8 +470,6 @@ class Fight:
         opponent = Opponent()
 
         reward = round(self.calculate_reward(opponent.average, player.average))
-        print(reward)
-        print(player.injury)
 
         game_state = {
             'round_num': 0,

@@ -10,5 +10,6 @@ urlpatterns = [
     path('fight/', views.fight, name='fight'),
     path('summary/', views.summary, name='summary'),
     path('recover/', views.recover_after_loss, name='recover'),
+    path('buy_stat/', views.buy_stat, name='buy_stat'),
     path('c/', views.clear, name='clear'),
 ]

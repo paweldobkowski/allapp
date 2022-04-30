@@ -6,7 +6,7 @@ import os.path
 import random, json, pickle
 
 from .models import FighterModel
-from .fight_game import Fighter, Fight, Judge, Utilities, Doctor
+from .fight_game import Fighter, Fight, Judge, Utilities, Doctor, Trainer
 
 # Create your views here.
 
@@ -47,12 +47,21 @@ def main(request):
 
             rarity=player.rarity,
 
+            coins=player.coins,
+
             hexed_instance = Utilities().hex_data(player) # in order to be able to access class, not only model
             )
         
         new_fighter.save()
 
         return redirect(reverse('game:main'))
+
+    power_disabled = ''
+    agility_disabled = ''
+    energy_disabled = ''
+    block_disabled = ''
+
+    point_cost = None
 
     try:
         player = FighterModel.objects.filter(user_id=user_id)
@@ -61,12 +70,36 @@ def main(request):
         Utilities().put_thing_in_session(request, player_instance, 'player', False)
 
         player = Utilities().unhex_data(player[0].hexed_instance)
+        point_cost = round((1.2**(player.average+5))*4)
+
+        if player.coins < point_cost:
+            power_disabled = 'disabled'
+            agility_disabled = 'disabled'
+            energy_disabled = 'disabled'
+            block_disabled = 'disabled'
+
+        if player.power >= 10:
+            power_disabled = 'disabled'
+
+        if player.agility >= 10:
+            agility_disabled = 'disabled'
+
+        if player.energy >= 5:
+            energy_disabled = 'disabled'
+        
+        if player.block >= 5:
+            block_disabled = 'disabled'
 
     except:
         player = None
 
     context = {
         'player': player,
+        'power_disabled': power_disabled,
+        'agility_disabled': agility_disabled,
+        'energy_disabled': energy_disabled,
+        'block_disabled': block_disabled,
+        'point_cost': point_cost,
         'game': 'active',
         'is_logged': request.session.get('is_logged'),
     }
@@ -243,9 +276,22 @@ def recover_after_loss(request):
 
     if request.method == 'POST':
         user_id = request.session.get('user_id')
+        request.POST.get('stat_to_buy')
         Doctor().recover_after_loss(request, user_id=user_id)
 
     return redirect(reverse('game:main'))
+
+def buy_stat(request):
+    if request.session.get('is_logged') != True:
+        return redirect('start')
+
+    if request.method == 'POST':
+        stat_to_buy = request.POST.get('stat_to_buy')
+        user_id = request.session.get('user_id')
+        Trainer().add_one_point(request, user_id=user_id, stat=stat_to_buy)
+
+    return redirect(reverse('game:main'))
+
 
 def clear(request):
     FighterModel.objects.all().delete()
