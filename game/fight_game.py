@@ -305,7 +305,7 @@ class Trainer:
         player_instance = Utilities().unhex_data(hexed_player_instance)
 
         # cost of a single point
-        point_cost = round((1.2**(player.average+5))*4)
+        point_cost = round((1.2**(player.average))*3)
 
         if player.coins >= point_cost:
             if stat == 'power':

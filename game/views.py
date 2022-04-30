@@ -70,7 +70,7 @@ def main(request):
         Utilities().put_thing_in_session(request, player_instance, 'player', False)
 
         player = Utilities().unhex_data(player[0].hexed_instance)
-        point_cost = round((1.2**(player.average+5))*4)
+        point_cost = round((1.2**(player.average))*3)
 
         if player.coins < point_cost:
             power_disabled = 'disabled'
