@@ -438,8 +438,6 @@ class Judge:
         player.injury = injury_level
         player_instance.injury = injury_level
 
-        print(f'player injury: {player_instance.injury}')
-
         player.hexed_instance = Utilities().hex_data(player_instance)        
         player.save()
 
