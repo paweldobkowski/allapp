@@ -90,14 +90,15 @@ def main(request):
         if player.block >= 5:
             block_disabled = 'disabled'
 
-        player_injured_life = player.life - round(player.life*player.injury*2)
+        player_current_life = player.life - round(player.life*player.injury*2)
 
     except:
         player = None
+        player_current_life = 0
 
     context = {
         'player': player,
-        'player_injured_life': player_injured_life,
+        'player_current_life': player_current_life,
         'power_disabled': power_disabled,
         'agility_disabled': agility_disabled,
         'energy_disabled': energy_disabled,
