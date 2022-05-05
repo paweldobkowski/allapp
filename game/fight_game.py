@@ -102,7 +102,7 @@ class Fighter:
         self.losses = 0
         self.draws = 0
 
-        self.injury = 'none'
+        self.injury = 0
 
     def punch(self, who):
         if self.energy <= 0: # you lose 1 energy when you punch
@@ -120,17 +120,17 @@ class Fighter:
             self.agility = self.agility - decrease_value_agility
 
         # check how the punch connects
-        player_agility = self.agility + Dice().roll_two()
-        opponent_agility = who.agility + Dice().roll_two()
+        player_agility = self.agility + Dice().roll_one()
+        opponent_agility = who.agility + Dice().roll_one()
 
-        speed_ratio = player_agility/opponent_agility
+        speed_ratio = (player_agility/opponent_agility)**2
 
         # players speed devided by opponents speed creates the ratio (range ~0,13 to ~7,3). everything above 1 means the player is faster and below means players is slower
         # ratio below 0,5 means a MISS (0 damage)
         # ratio above 4 means a DOUBLE (damage x2)
 
         if speed_ratio <= 0.5:
-            damage_factor = 0
+            damage_factor = 0.1
 
         elif speed_ratio >= 2:
             damage_factor = 2
@@ -141,6 +141,7 @@ class Fighter:
         pure_damage = self.power * Dice().roll_two()
 
         damage = ceil(pure_damage*damage_factor*(1-who.block_factor))
+        print(f'df: {damage_factor}, dmg: {damage}')
 
         if who.life - damage <= 0:
             who.life = 0
@@ -156,10 +157,10 @@ class Fighter:
         block_factor = 1 if block_effectiveness >= 10 else 0.2
         self.block_factor = block_factor
 
-        if self.block <= 0:
-            self.block = 0
-        else:
-            self.block -= 1
+        # if self.block <= 0:
+        #     self.block = 0
+        # else:
+        #     self.block -= 1
 
         return damage
 
@@ -226,11 +227,6 @@ class Opponent(Fighter):
         average = (life_percent*0.5 + energy_percent*0.5 + power_percent + agility_percent + block_percent*0.5)/5
 
         self.average = average
-
-        # 0 - 70: COMMON
-        # 70 - 80: RARE
-        # 80 - 95: EPIC
-        # 95 - 100: LEGENDARY
 
         if average <= 40:
             rarity = 'COMMON'
@@ -305,7 +301,7 @@ class Trainer:
         player_instance = Utilities().unhex_data(hexed_player_instance)
 
         # cost of a single point
-        point_cost = round((1.2**(player.average))*3)
+        point_cost = round((1.2**(player.average))*2)
 
         if player.coins >= point_cost:
             if stat == 'power':
@@ -367,19 +363,18 @@ class Doctor:
         hexed_player_instance = player.hexed_instance
         player_instance = Utilities().unhex_data(hexed_player_instance)
 
-        if player.injury == 'hard':
-            if player.coins != 0:
-                player.coins = round(player.coins - player.coins/2)
-                player_instance.coins = round(player_instance.coins - player_instance.coins/2)
+        recovery_cost = 1 - player.injury
 
-        elif player.injury == 'light':
-            if player.coins != 0:
-                player.coins = round(player.coins - player.coins/3)
-                player_instance.coins = round(player_instance.coins - player_instance.coins/3)
+        if player.coins >= 0:
+            player.coins = round(player.coins * recovery_cost)
+            player_instance.coins = round(player_instance.coins * recovery_cost)
+        else:
+            player.coins = 0
+            player_instance.coins = 0
 
-        player.injury = 'none'
-        player_instance.injury = 'none'
-        
+        player.injury = 0
+        player_instance.injury = 0
+
         player.hexed_instance = Utilities().hex_data(player_instance)        
         player.save()
 
@@ -430,22 +425,18 @@ class Judge:
                 player_instance.ko += 1
 
         elif win == False:
-            player.injury = 'light'
-            player_instance.injury = 'light'
-
             player.losses += 1
             player_instance.losses += 1
 
-            if loss_by_ko:
-                player.injury = 'hard'
-                player_instance.injury = 'hard'
-
         elif win == None:
-            player.injury = 'light'
-            player_instance.injury = 'light'
-
             player.draws += 1
             player_instance.draws += 1
+
+        game_state_player = game_state['player']['instance']
+        injury_level = 0.5 - (game_state_player.life*0.5)/game_state_player.max_life
+
+        player.injury = injury_level
+        player_instance.injury = injury_level
 
         print(f'player injury: {player_instance.injury}')
 

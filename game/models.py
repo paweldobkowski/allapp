@@ -31,7 +31,7 @@ class FighterModel(models.Model):
     losses = models.IntegerField(default=0)
     draws = models.IntegerField(default=0)
 
-    injury = models.TextField(default='none')
+    injury = models.FloatField(default=0.0)
 
     average = models.IntegerField()
     coins = models.IntegerField(default=0)

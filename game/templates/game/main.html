@@ -2,6 +2,8 @@
 
 {% load static %}
 
+{% load game_extras %}
+
 {% block body %}
 
 {% if player %}
@@ -32,8 +34,8 @@
                             </div>
                             <div class="col">
                                 <div class="progress" style="height: 20px;">
-                                    <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" style="width: {% widthratio player.life 200 100 %}%" aria-valuenow="{% widthratio player.life 200 100 %}" aria-valuemin="0" aria-valuemax="100">
-                                        <b>{{ player.life }}</b>
+                                    <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" style="width: {% widthratio player_injured_life 200 100 %}%" aria-valuenow="{% widthratio player_injured_life 200 100 %}" aria-valuemin="0" aria-valuemax="100">
+                                        <b>{{ player_injured_life }}</b>
                                     </div>
                                 </div>
                             </div>
@@ -93,25 +95,16 @@
                 <h4>RECORD:</h4>
                     wins: <b>{{ player.wins }}</b> (KO: <b>{{ player.ko }}</b>), losses: <b>{{ player.losses }}</b>, draws: <b>{{ player.draws }}</b></b>
 
-{% if player.injury == 'light' %}
+{% if player.injury != 0 %}
 
                     <div class="container" style="padding: 2em">
                         <form action="{% url 'game:recover' %}" method="POST">
                             {% csrf_token %}
-                            <button type="submit" value="RECOVER AFTER KO" class="btn btn-danger btn-lg">RECOVER <img src="{% static 'images/coin.gif' %}" style="max-width: 30px;"><b>{% widthratio player.coins 3 1 %}</b></button>
+                            <button type="submit" value="RECOVER AFTER KO" class="btn btn-danger btn-lg">RECOVER <img src="{% static 'images/coin.gif' %}" style="max-width: 30px;"><b>{{ player.coins | recovery_cost:player.injury }}</b></button>
                         </form>
                     </div>
 
-{% elif player.injury == 'hard' %}
-
-                <div class="container" style="padding: 2em">
-                    <form action="{% url 'game:recover' %}" method="POST">
-                        {% csrf_token %}
-                        <button type="submit" value="RECOVER AFTER LOSS OR DRAW" class="btn btn-danger btn-lg">RECOVER <img src="{% static 'images/coin.gif' %}" style="max-width: 30px;"><b>{% widthratio player.coins 2 1 %}</b></button>
-                    </form>
-                </div>
-
-{% elif player.injury == 'none' %}
+{% elif player.injury == 0 %}
 
                 <div class="container" style="padding: 2em">
                     <form action="{% url 'game:introduction' %}" method="POST">

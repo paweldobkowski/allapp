@@ -70,7 +70,7 @@ def main(request):
         Utilities().put_thing_in_session(request, player_instance, 'player', False)
 
         player = Utilities().unhex_data(player[0].hexed_instance)
-        point_cost = round((1.2**(player.average))*3)
+        point_cost = round((1.2**(player.average))*2)
 
         if player.coins < point_cost:
             power_disabled = 'disabled'
@@ -90,11 +90,14 @@ def main(request):
         if player.block >= 5:
             block_disabled = 'disabled'
 
+        player_injured_life = player.life - round(player.life*player.injury*2)
+
     except:
         player = None
 
     context = {
         'player': player,
+        'player_injured_life': player_injured_life,
         'power_disabled': power_disabled,
         'agility_disabled': agility_disabled,
         'energy_disabled': energy_disabled,
