@@ -102,7 +102,7 @@ class Fighter:
         self.losses = 0
         self.draws = 0
 
-        self.injury = 0
+        self.injury = 0.0
 
     def punch(self, who):
         if self.energy <= 0: # you lose 1 energy when you punch
